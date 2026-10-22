@@ -27,6 +27,7 @@ Requirements for the OpenDAP OS distribution.
 | OS-021 | The default image shall contain only what is mandatory; optional components (for example LLVM) shall be installable from the OpenDAP repositories instead. | must | Confirmed |
 | OS-022 | The T1 shall use SD/TF storage both directly and through cache or preload levels in eMMC and RAM. | must | Confirmed |
 | OS-023 | OpenDAP OS shall provide its own optimised builds of Linux packages where that serves the device (tuned for the SoC, trimmed dependencies, patches carried until upstream), from the OpenDAP repositories, instead of relying only on stock distribution packages. | must | Confirmed |
+| OS-024 | The default image shall contain only OpenDAP's own ecosystem. Third-party software is never installed by default. Advanced packages outside the audiophile core (for example the software of special HATs) shall come from a separate OpenDAP repository and are not installed by default. | must | Confirmed |
 
 ## Context
 
