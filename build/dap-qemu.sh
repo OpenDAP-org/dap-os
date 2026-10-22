@@ -43,7 +43,7 @@ case "${1:-start}" in
     [ -f "$run/qemu.pid" ] && kill "$(cat "$run/qemu.pid")" 2>/dev/null && rm -f "$run/qemu.pid"; echo stopped;;
   ssh)
     shift
-    exec ssh -i "$key" -p "$port" -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@127.0.0.1 "$@";;
+    exec ssh -i "$key" -p "$port" -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@127.0.0.1 -- "$@";;  # `--`: nothing after the host is read as an ssh option
   console)
     exec tail -f "$run/console.log";;
   *) echo "usage: $0 start|stop|ssh [command…]|console" >&2; exit 2;;
