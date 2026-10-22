@@ -1,0 +1,32 @@
+# Lima VM used to build DAP OS images on macOS (Apple Silicon) or Linux.
+#   limactl start --name=dapos-build build/lima/dapos-build.yaml
+# Debian 13 (trixie) arm64, the same distribution DAP OS is built from.
+minimumLimaVersion: 2.0.0
+base:
+- template:_images/debian-13
+vmType: vz
+cpus: 6
+memory: 8GiB
+disk: 64GiB
+mounts:
+# The OpenDAP workspace, so image definitions and outputs are shared with the host.
+- location: "~/Documents/work/opendap"
+  writable: true
+provision:
+- mode: system
+  script: |
+    #!/bin/sh
+    set -eu
+    export DEBIAN_FRONTEND=noninteractive
+    grep -q trixie-backports /etc/apt/sources.list.d/*.sources 2>/dev/null || cat > /etc/apt/sources.list.d/backports.sources <<'SRC'
+    Types: deb
+    URIs: http://deb.debian.org/debian
+    Suites: trixie-backports
+    Components: main
+    Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+    SRC
+    apt-get update
+    apt-get install -y --no-install-recommends \
+      mkosi systemd-container systemd-repart dosfstools e2fsprogs erofs-utils \
+      squashfs-tools cpio zstd xz-utils qemu-system-arm qemu-utils ovmf qemu-efi-aarch64 \
+      debian-archive-keyring apt git ca-certificates openssh-client

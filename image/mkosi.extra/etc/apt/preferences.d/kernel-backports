@@ -1,0 +1,4 @@
+# Take the kernel from trixie-backports (mainline 7.x, dap-os ADR 0002).
+Package: linux-image-* linux-base
+Pin: release n=trixie-backports
+Pin-Priority: 990

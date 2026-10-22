@@ -1,0 +1,6 @@
+# Virtual T1: DHCP on QEMU's user-mode network.
+[Match]
+Type=ether
+
+[Network]
+DHCP=yes

@@ -1,0 +1,41 @@
+# DAP OS requirements
+
+Requirements for the DAP OS distribution.
+
+| ID | Requirement | Priority | Status |
+|---|---|---|---|
+| OS-001 | DAP OS shall run a mainline Linux kernel, version 7 or later. | must | Confirmed |
+| OS-002 | DAP OS shall not require custom kernel builds. | must | Confirmed |
+| OS-003 | DAP OS shall stay desktop-style, not embedded-style. | must | Confirmed |
+| OS-004 | DAP OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
+| OS-005 | DAP OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
+| OS-006 | DAP OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
+| OS-007 | The kernel shall be updatable as a prebuilt package. | should | Draft |
+| OS-008 | DAP OS shall be the real host of all peripheral hardware on the board and on HATs: it shall flash, operate and debug every programmable chip (microcontrollers, FPGAs, other SoCs), including the board's RP coprocessor. | must | Confirmed |
+| OS-009 | Developers shall be able to run DAP OS on their host machine (container or QEMU), connect to it and control it, and change it through code and configuration files. | must | Confirmed |
+| OS-010 | DAP OS shall be built up from code and configuration, with OpenDAP software and drivers preinstalled, into a final image. | must | Confirmed |
+| OS-011 | Images shall be signed, versioned and published as releases. | must | Confirmed |
+| OS-012 | Flashing a release image shall be simple and direct. | must | Confirmed |
+| OS-013 | DAP OS shall receive updates both from the Linux distribution repositories and from OpenDAP software repositories. | must | Confirmed |
+| OS-014 | DAP OS should support over-the-air (OTA) updates. | should | Draft |
+| OS-015 | Development tools that are not for end users (for example OpenOCD) shall come from a separate OpenDAP repository: available and tested on the device, not installed by default. | must | Confirmed |
+| OS-016 | Headless development and automation shall run on QEMU; UI work may use UTM. | must | Confirmed |
+| OS-017 | Recovery: the device shall be recoverable from MaskROM, and A/B updates shall roll back automatically when a new version fails. | must | Draft |
+| OS-018 | The virtual T1 (QEMU) shall mimic the T1 hardware as closely as possible: 320 × 480 portrait display, the four buttons, audio output, battery, and the coprocessor and HAT presence where they can be emulated. | must | Confirmed |
+| OS-019 | Running instances (virtual or real) shall be controllable remotely: a remote desktop, and headless automation over SSH (screenshots, input injection, scripted UI flows). | must | Confirmed |
+| OS-020 | Playback shall be bit-perfect, including DSD (native and DoP). | must | Confirmed |
+| OS-021 | The default image shall contain only what is mandatory; optional components (for example LLVM) shall be installable from the OpenDAP repositories instead. | must | Confirmed |
+| OS-022 | The T1 shall use SD/TF storage both directly and through cache or preload levels in eMMC and RAM. | must | Confirmed |
+
+## Open questions
+
+- Base distribution: Debian or Alpine.
+
+## Context
+
+- Base distribution candidates under review: Armbian, Alpine and others; see `docs/research/` when available.
+- OS-017 to OS-017: Adopted from the earlier experiments on 2026-10-21 as **Draft**: consistent with the decisions already taken and with the product philosophy, pending the maintainers' confirmation. Part availability still has to be checked against the sourcing rule (T1-010).
+- The virtual T1 has no battery yet: the Debian kernel does not build the `test_power` module, so battery emulation will come from an OpenDAP service.
+- Pending: deep suspend (suspend-to-RAM) on the RK3566 depends on mainline TF-A support, not verified yet. Not a priority for now, but must be revisited.
+- Audio direction from the image-composition research: PipeWire processes audio as 32-bit float, so bit-perfect 32-bit PCM and DSD need a playback engine with exclusive, direct ALSA access, next to PipeWire for shared use.
+- Image size: acceptable as long as it works well and is not excessive for the device; reduce further only if needed. Dropping LLVM by default may require an OpenDAP build of Mesa limited to Panfrost, because Debian's Mesa depends on LLVM.
