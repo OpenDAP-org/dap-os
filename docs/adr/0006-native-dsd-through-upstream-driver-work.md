@@ -11,3 +11,4 @@ Playback must be bit-perfect including DSD, native and DoP (OS-020). The mainlin
 
 - DoP works from the start on the on-board outputs.
 - OpenDAP adds native DSD support to the Rockchip I2S driver (and extends the CS43198 limits where the hardware allows), and upstreams it to mainline Linux.
+- **DSD rates (amended 2026-10-22, [DSD512 research](../research/2026-10-dsd512.md)):** native and bit-perfect on the on-board outputs up to **DSD256**, the CS43198's hardware limit (DSDCLK ≤ fMCLK_INT / 2). **DSD512** files play on-board through a visible, labelled conversion in the playback engine (PCM 352.8 kHz / 32-bit by default). Native DSD512 and above go bit-perfect to external USB DACs that support them.

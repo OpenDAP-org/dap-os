@@ -40,3 +40,4 @@ Requirements for the OpenDAP OS distribution.
   - BQ25895 charger: its watchdog restores a 2048 mA charge current when it expires, so the charger driver or an OpenDAP OS service must keep it serviced or disable it. Whether the mainline `bq25890_charger` driver does this is **UNVERIFIED**.
   - INA236 current monitors power up converting continuously; they are configured at boot.
   - RP2354A coprocessor firmware must select 1.8 V I/O (`VOLTAGE_SELECT = 1`).
+- OS-020 scope (maintainers, 2026-10-22): bit-perfect up to DSD256 on the on-board outputs and up to the external DAC's limit over USB; higher DSD rates on-board are converted and labelled ([ADR 0006](../adr/0006-native-dsd-through-upstream-driver-work.md), [DSD512 research](../research/2026-10-dsd512.md)).
