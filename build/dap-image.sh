@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build a DAP OS image inside the Debian build VM.
+# Build a OpenDAP OS image inside the Debian build VM.
 # Usage: build/dap-image.sh [profile]   (default: qemu)
 set -eu
 profile="${1:-qemu}"
@@ -11,7 +11,7 @@ if [ "$profile" = qemu ]; then
   key="$here/dev-ssh/id_ed25519"
   if [ ! -f "$key" ]; then
     mkdir -p "$here/dev-ssh"
-    ssh-keygen -q -t ed25519 -N "" -C "dap-os development" -f "$key"
+    ssh-keygen -q -t ed25519 -N "" -C "opendap-os development" -f "$key"
   fi
   mkdir -p "$here/dev-ssh/tree/root/.ssh"
   cp "$key.pub" "$here/dev-ssh/tree/root/.ssh/authorized_keys"
@@ -19,10 +19,10 @@ if [ "$profile" = qemu ]; then
 fi
 
 # Create the build VM on first use; start it if it exists but is stopped.
-if ! limactl list -q 2>/dev/null | grep -qx dapos-build; then
-  limactl start --name=dapos-build --tty=false "$here/lima/dapos-build.yaml"
-elif [ "$(limactl list --format '{{.Status}}' dapos-build)" != Running ]; then
-  limactl start --tty=false dapos-build
+if ! limactl list -q 2>/dev/null | grep -qx opendap-os-build; then
+  limactl start --name=opendap-os-build --tty=false "$here/lima/opendap-os-build.yaml"
+elif [ "$(limactl list --format '{{.Status}}' opendap-os-build)" != Running ]; then
+  limactl start --tty=false opendap-os-build
 fi
-limactl shell dapos-build -- sudo mkosi -C "$repo/image" --profile="$profile" -f build
+limactl shell opendap-os-build -- sudo mkosi -C "$repo/image" --profile="$profile" -f build
 ls -lh "$repo/image/mkosi.output/"

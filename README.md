@@ -1,4 +1,4 @@
-# DAP OS
+# OpenDAP OS
 
 Official distribution: image build, per-SKU profiles and releases.
 

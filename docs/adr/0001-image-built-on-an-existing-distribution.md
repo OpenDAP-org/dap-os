@@ -9,4 +9,4 @@ A full Buildroot-style build is not wanted (OS-002, OS-003).
 
 ## Decision
 
-Build DAP OS as a trimmed custom image on top of an existing distribution. The base distribution is still open.
+Build OpenDAP OS as a trimmed custom image on top of an existing distribution. The base distribution is still open.

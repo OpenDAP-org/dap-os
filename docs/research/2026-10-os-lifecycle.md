@@ -1,8 +1,8 @@
-# DAP OS lifecycle and on-device peripheral hosting: research
+# OpenDAP OS lifecycle and on-device peripheral hosting: research
 
 - **Date:** 2026-10-21
 - **Status:** research, not a decision. Everything labelled **Recommendation** is a proposal for the maintainers to decide on. Nothing here changes an ADR.
-- **Scope:** the full DAP OS lifecycle (development, image build, signing, release, flashing, OTA updates) and how DAP OS hosts every programmable peripheral chip on the board and on HATs.
+- **Scope:** the full OpenDAP OS lifecycle (development, image build, signing, release, flashing, OTA updates) and how OpenDAP OS hosts every programmable peripheral chip on the board and on HATs.
 - **Related:** [`2026-10-base-distribution.md`](2026-10-base-distribution.md), ADR 0001/0002 in [`../adr/`](../adr/), board ADR 0003 (RK3566), `toolkit/docs/research/2026-10-software-firmware-toolchain.md` (it overlaps sections 1, 4 and 6 of this report; this report goes deeper and is consistent with it unless stated).
 
 ## 0. Inputs
@@ -14,8 +14,8 @@
 - Board support comes from a device tree plus overlays applied by U-Boot.
 - All custom software is Rust: services, orchestrator, and the Slint-on-Wayland UI.
 - No CI. Everything runs on developer machines (macOS on Apple Silicon first, Linux too), driven by local scripts, pre-commit and Claude Code skills.
-- OS-008 / BRD-004 / BRD-005 / HCS-013: DAP OS is the real host of every programmable chip, on the board and on HATs. Helper MCUs never sit in a data path.
-- BRD-014 / BRD-015: there is an RP-series coprocessor (exact part not fixed), and DAP OS flashes and updates it.
+- OS-008 / BRD-004 / BRD-005 / HCS-013: OpenDAP OS is the real host of every programmable chip, on the board and on HATs. Helper MCUs never sit in a data path.
+- BRD-014 / BRD-015: there is an RP-series coprocessor (exact part not fixed), and OpenDAP OS flashes and updates it.
 - HCS-007…011, SYS-010/011: HATs carry signed capability manifests in EEPROM. Capabilities are fetched over HTTP (reverse-domain / well-known) through the package endpoint.
 
 **Evidence convention.** A version is a live query made on 2026-10-21 against the URL given: GitHub Releases/Tags API, crates.io API, Homebrew API, Debian madison (`qa.debian.org/madison.php`), or the upstream docs. **UNVERIFIED** marks anything not checked against a primary source in this session.
@@ -28,7 +28,7 @@
 2. **On macOS the builder must be a Linux VM.** Run mkosi inside an arm64 Debian trixie VM (Lima 2.2.1 with `vmType: vz`, or an OrbStack machine). The build is native arm64, so no binfmt is needed. The image itself runs best in **QEMU 11.1.2 with HVF** on the macOS host. In the Homebrew build, virtio-gpu is **2D only**: the formula has no virglrenderer dependency ([formula API](https://formulae.brew.sh/api/formula/qemu.json)), so the guest renders with llvmpipe. UTM 5.0.8 gives GL through `virtio-gpu-gl-pci` with ANGLE/Metal ([UTM docs](https://docs.getutm.app/guest-support/linux/)).
 3. **A fully open flashing path exists, in Rust, without sudo on macOS.** Mainline U-Boot can build MaskROM images (`CONFIG_ROCKCHIP_MASKROM_IMAGE` → `u-boot-rockchip-usb471.bin` / `usb472.bin`, [rockchip-u-boot.dtsi v2026.10](https://github.com/u-boot/u-boot/blob/v2026.10/arch/arm/dts/rockchip-u-boot.dtsi)). Collabora's `rockusb` crate (**0.4.0**, 2026-09-09) can push them (`download-sram` / `download-ddr`) and then write a `.img` + `.bmap` (`write-bmap`, gzip/zstd) over the nusb backend. This is the base for a one-command `dap flash`.
 4. **For OTA, RAUC fits our stack best.** U-Boot now ships a **RAUC bootmeth** (`bootmeth_rauc.c`, first commit 2025-06-18, [docs](https://docs.u-boot.org/en/latest/develop/bootstd/rauc.html)). It implements `BOOT_ORDER` / `BOOT_x_LEFT` A/B with try counters. RAUC (upstream **1.15.2**; trixie **1.13**) has signed verity bundles, HTTP streaming (Range requests) and *adaptive* (block-hash-index) updates. A static HTTP server through the package endpoint is enough.
-5. **Debian's OpenOCD cannot bit-bang SWD from Linux GPIO.** Debian `openocd 0.12.0-2` disabled the libgpiod backend (changelog: "Disable libgpiod backend (Closes: #1070885)", [debian/changelog](https://sources.debian.org/src/openocd/0.12.0-3/debian/changelog/)). The last upstream release is still **v0.12.0 (2023-01-14)**. Upstream *master* has the pieces we need: libgpiod v2 support (Sept 2025), the **`linuxspidev` SWD adapter** (SWD over a SPI controller, 1 kΩ between MOSI and MISO, up to about 3 MHz) and RP2350 support (Apr 2025) ([openocd.texi](https://github.com/openocd-org/openocd/blob/master/doc/openocd.texi)). **DAP OS has to package OpenOCD from a pinned git commit.**
+5. **Debian's OpenOCD cannot bit-bang SWD from Linux GPIO.** Debian `openocd 0.12.0-2` disabled the libgpiod backend (changelog: "Disable libgpiod backend (Closes: #1070885)", [debian/changelog](https://sources.debian.org/src/openocd/0.12.0-3/debian/changelog/)). The last upstream release is still **v0.12.0 (2023-01-14)**. Upstream *master* has the pieces we need: libgpiod v2 support (Sept 2025), the **`linuxspidev` SWD adapter** (SWD over a SPI controller, 1 kΩ between MOSI and MISO, up to about 3 MHz) and RP2350 support (Apr 2025) ([openocd.texi](https://github.com/openocd-org/openocd/blob/master/doc/openocd.texi)). **OpenDAP OS has to package OpenOCD from a pinned git commit.**
 6. **probe-rs (0.32.0) has no Linux-GPIO or spidev probe** (driver list: blackmagic, ch347, cmsisdap, ftdi, glasgow, jlink, stlink, sifliuart, ti_icdi, wlink, xvc; the bitbang PR [#1579](https://github.com/probe-rs/probe-rs/pull/1579) was closed). So probe-rs on the device works only with USB probes, which would put a helper MCU in the debug path. **Recommendation:** use OpenOCD for SoC-driven SWD/JTAG now, and contribute a gpiod/spidev probe to probe-rs later.
 7. **The Debian kernel has FPGA Manager disabled** (`# CONFIG_FPGA is not set` on the `debian/latest` branch, [debian/config](https://salsa.debian.org/kernel-team/linux/-/tree/debian/latest/debian/config)). FPGA configuration must therefore be **userspace**: openFPGALoader (upstream **v1.2.0**, 2026-10-18, has a `libgpiod` JTAG cable and an XVC server; trixie has 0.13.1), or a small Rust spidev + gpiod loader for iCE40/ECP5 slave-SPI.
 8. **An RP2350 makes BRD-015 safe by design; an RP2040 does not.** The RP2350 bootrom has A/B partitions, **Try-Before-You-Buy** (the new image must call `explicit_buy()` within 16.7 s or the bootrom falls back), anti-rollback, signed images (secp256k1), USB BOOTSEL and a **UART boot** mode ([RP2350 datasheet §5.1.7, §5.1.17, §5.8](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)). Add SoC-driven SWD and the coprocessor is always recoverable from Linux.
@@ -37,7 +37,7 @@
 
 ---
 
-## 2. Dev loop: running DAP OS on the host (OS-009)
+## 2. Dev loop: running OpenDAP OS on the host (OS-009)
 
 ### 2.1 Where each kind of test can run
 
@@ -46,7 +46,7 @@
 | **Native macOS** (`cargo run`) | rustup toolchain | n/a | no | Slint runs natively (winit), with no Wayland compositor | CoreAudio | no; mock the HAL | no | Fastest loop for UI and service logic with mocked hardware |
 | **OCI container** (OrbStack, Docker, Apple `container`) | OrbStack 2.2.4 ([cask](https://formulae.brew.sh/api/cask/orbstack.json)); Apple `container` 1.6.0 (2026-10-20) ([releases](https://github.com/apple/container/releases)) | the VM's kernel, **not** Debian's (Apple `container` boots its own minimal kernel per container, [technical overview](https://github.com/apple/container/blob/main/docs/technical-overview.md)) | Docker/OrbStack: possible with extra flags (**UNVERIFIED** exact flags for systemd 257 in OrbStack). Apple `container`: PID 1 is `vminitd`; a custom init image is possible ([runtime-configuration](https://github.com/apple/container/blob/main/docs/runtime-configuration.md)), but systemd as PID 1 is **UNVERIFIED** | Headless compositor (e.g. weston headless/RDP, or cage + wayvnc) plus screenshots | PipeWire null sink | no | no | Service integration tests, bus/API tests, packaging checks (`apt install` of our .debs) |
 | **systemd-nspawn via `mkosi boot`** inside the Linux builder VM | systemd 257.13 (trixie) | builder VM kernel (Debian) | **yes**, full systemd | headless compositor | null sink | no | no | The closest thing to a "container of the real rootfs": units, timers, users and tmpfiles behave as on the device |
-| **Lima / OrbStack machine** (Debian trixie cloud image) | Lima 2.2.1 ([releases](https://github.com/lima-vm/lima/releases)) | Debian kernel | yes | headless | null sink | no | no | **Builder VM** (mkosi, cargo-deb, aptly). Not the DAP OS image itself |
+| **Lima / OrbStack machine** (Debian trixie cloud image) | Lima 2.2.1 ([releases](https://github.com/lima-vm/lima/releases)) | Debian kernel | yes | headless | null sink | no | no | **Builder VM** (mkosi, cargo-deb, aptly). Not the OpenDAP OS image itself |
 | **QEMU `virt` + HVF** on macOS | QEMU 11.1.2 (Homebrew) | **our image's** trixie-backports kernel | yes | `virtio-gpu` 2D + llvmpipe; compositor on DRM as on the device | `virtio-sound-pci` → `-audiodev coreaudio` ([virtio-snd doc](https://www.qemu.org/docs/master/system/devices/virtio/virtio-snd.html)) | no SoC drivers. Kernel config has `DRM_VIRTIO_GPU=m` and `SND_VIRTIO=m` | **yes**: same GPT layout, verity and RAUC. U-Boot `qemu_arm64` as firmware lets us test the U-Boot A/B logic (**UNVERIFIED** under HVF; TCG works) | Image-level tests: boot, first boot, read-only root, OTA install and rollback, compositor, audio routing |
 | **UTM** (QEMU backend) | 5.0.8 | our kernel | yes | `virtio-gpu-gl-pci`: GL via virgl, Vulkan via Venus, ANGLE/Metal | CoreAudio | no | yes | UI performance with GPU acceleration |
 | **RK3566 reference board** (before T1 hardware exists) | U-Boot v2026.10 defconfigs, e.g. `radxa-zero-3-rk3566`, `quartz64-a-rk3566`, `anbernic-rgxx3-rk3566` ([U-Boot rockchip doc](https://github.com/u-boot/u-boot/blob/v2026.10/doc/board/rockchip/rockchip.rst)) | our kernel + mainline DTB | yes | VOP2 + Panfrost, the real thing | real I2S/codec, but not our DAC | most SoC drivers; not our board's DAC, PMIC wiring or RP | yes, the real boot chain | **Recommendation:** buy two or three of these now. Use them to validate U-Boot, FIT, RAUC, flashing and Panfrost/Wayland before the T1 exists |
@@ -64,7 +64,7 @@ What none of the virtual targets can test: the RK3566 display pipeline, Panfrost
 - `mkosi boot` (nspawn) and `mkosi vm` (qemu or vmspawn) give quick boots inside the builder VM.
 - Fallback: mmdebstrap 1.5.7 + systemd-repart/genimage, as in the toolkit report. It is more Debian-native and simpler, but we would rebuild profiles, verity wiring, OCI export and the VM boot ourselves.
 
-Proposed layout in `dap-os/image/` (illustrative):
+Proposed layout in `opendap-os/image/` (illustrative):
 
 ```text
 image/
@@ -93,7 +93,7 @@ The QEMU fast path (`Bootloader=uki`, EDK2 from Homebrew's QEMU) boots in second
 | Command | What it does |
 |---|---|
 | `dap builder up` | Creates or starts the Lima VM "dap-builder" (Debian trixie arm64, `vmType: vz`, workspace mounted with virtiofs, mkosi/cargo/aptly installed by a provisioning script in `toolkit/host/`) |
-| `dap build [t1\|qemu\|oci]` | Runs `mkosi --profile …` in the builder VM. Outputs go to `dap-os/image/mkosi.output/` |
+| `dap build [t1\|qemu\|oci]` | Runs `mkosi --profile …` in the builder VM. Outputs go to `opendap-os/image/mkosi.output/` |
 | `dap vm up [--fidelity]` | Runs QEMU on the macOS host: `-accel hvf -cpu host -M virt`, virtio-blk on the image, `virtio-gpu-pci` (or `-gl`), `virtio-sound-pci` + coreaudio, `-netdev user,hostfwd=tcp::2222-:22`, `-serial unix:…` for the console, `-qmp unix:…` for control |
 | `dap ssh [target]` / `dap console [target]` | SSH (keys installed by the dev profile) or the serial console (QEMU unix socket; `tio` on a real device) |
 | `dap deploy <crate> [--target vm\|dev-board\|t1] [--watch]` | Cross-builds and installs as a **development sysext** (see below), then restarts the unit |
@@ -128,9 +128,9 @@ This works the same way on QEMU, a reference board and the T1, and never mutates
 
 | Kind of change | Where it lives | How it is promoted |
 |---|---|---|
-| Rust service, orchestrator, UI | `system` → `cargo-deb` → OpenDAP APT repo | bump the version in `dap-os/image/packages.lock` |
-| System configuration (`/etc` drop-ins, units, udev rules, polkit, PipeWire config) | `dap-os` package `dap-os-config` (built with dpkg-deb/debhelper from `dap-os/overlays/`) | same; it then appears in the manifest and the SBOM |
-| Debian package set | `dap-os/image/mkosi.conf.d/10-base.conf` | git review, then a rebuild |
+| Rust service, orchestrator, UI | `system` → `cargo-deb` → OpenDAP APT repo | bump the version in `opendap-os/image/packages.lock` |
+| System configuration (`/etc` drop-ins, units, udev rules, polkit, PipeWire config) | `opendap-os` package `opendap-os-config` (built with dpkg-deb/debhelper from `opendap-os/overlays/`) | same; it then appears in the manifest and the SBOM |
+| Debian package set | `opendap-os/image/mkosi.conf.d/10-base.conf` | git review, then a rebuild |
 | Debian versions | `Snapshot=` ID in `mkosi.conf` | "snapshot bump" commit, rebuild and test |
 | Board DT and overlays | `board` repo → package `dap-t1-dtb` (built against the matching kernel's dts includes) | `packages.lock` |
 | Per-device state | `/var` (data partition); never in the image | n/a |
@@ -204,7 +204,7 @@ Client side:
 
 ### 4.1 Reproducible build
 
-- Inputs: the git commit of `dap-os`, the Debian snapshot ID, the OpenDAP aptly snapshot name, the mkosi version, and the U-Boot artifact hash (from the boot-chain research).
+- Inputs: the git commit of `opendap-os`, the Debian snapshot ID, the OpenDAP aptly snapshot name, the mkosi version, and the U-Boot artifact hash (from the boot-chain research).
 - mkosi `SourceDateEpoch=` (= commit time) and `Seed=` (fixed). Packages are installed from pinned snapshots. Output compression is set explicitly.
 - Verify with a periodic **double build** (two different developer machines, or two builder VMs) and compare with `diffoscope` (Debian package, **UNVERIFIED** version) and `reprotest` 0.7.30. Without CI, make this a release checklist step (section 4.7).
 - Reproducibility also matters for OTA efficiency: RAUC adaptive updates (block-hash-index) only save bandwidth if unchanged files land in unchanged blocks. Use a stable erofs build (sorted, fixed timestamps). Measure whether erofs compression hurts block reuse (**UNVERIFIED**, needs measurement).
@@ -263,9 +263,9 @@ Client side:
   - Rust crates are embedded with `cargo auditable` (**UNVERIFIED** version) or listed with `cargo-cyclonedx` (**UNVERIFIED** version);
   - each release ships `sbom.spdx.json` + `sbom.cdx.json`.
 - **Image version (recommendation): CalVer `YYYY.MM.N`** (e.g. `2026.11.0`), with channels `dev`/`beta`/`stable`.
-  - Written to `/usr/lib/os-release` as `IMAGE_ID=dap-os-t1` and `IMAGE_VERSION=2026.11.0` (UAPI fields; mkosi sets them from `ImageId=`/`ImageVersion=`).
+  - Written to `/usr/lib/os-release` as `IMAGE_ID=opendap-os-t1` and `IMAGE_VERSION=2026.11.0` (UAPI fields; mkosi sets them from `ImageId=`/`ImageVersion=`).
   - Packages keep SemVer. Monotonic CalVer suits RAUC compatibility checks and the RP2350-style anti-rollback counters.
-- **Release notes:** generate from (a) the mkosi `changelog` manifest diff against the previous release (Debian package changes, including security fixes), (b) `git log` of `dap-os`, `system`, `board` between release tags, (c) the firmware index diff. This can be a Claude Code skill (`/dap-os:release-notes`, **proposal**) that drafts, with a human editing.
+- **Release notes:** generate from (a) the mkosi `changelog` manifest diff against the previous release (Debian package changes, including security fixes), (b) `git log` of `opendap-os`, `system`, `board` between release tags, (c) the firmware index diff. This can be a Claude Code skill (`/opendap-os:release-notes`, **proposal**) that drafts, with a human editing.
 
 ### 4.5 Keys and signing
 
@@ -292,14 +292,14 @@ Without CI, signing happens on a release manager's machine. **Recommendation:**
 GitHub Releases allow up to 1000 assets per release, each **under 2 GiB**, with no total-size or bandwidth limit ([GitHub docs](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)). Upload from a local machine with `gh release create` ([gh manual](https://cli.github.com/manual/gh_release_create)).
 
 ```text
-dap-os v2026.11.0 (GitHub Release in opendap-project/dap-os, tag v2026.11.0)
-  dap-os-t1-2026.11.0.img.zst            # full eMMC image incl. U-Boot (flash with dap flash / bmaptool)
-  dap-os-t1-2026.11.0.img.bmap
-  dap-os-t1-2026.11.0.raucb              # OTA bundle (verity format, streamable)
+opendap-os v2026.11.0 (GitHub Release in opendap-project/opendap-os, tag v2026.11.0)
+  opendap-os-t1-2026.11.0.img.zst            # full eMMC image incl. U-Boot (flash with dap flash / bmaptool)
+  opendap-os-t1-2026.11.0.img.bmap
+  opendap-os-t1-2026.11.0.raucb              # OTA bundle (verity format, streamable)
   u-boot-t1-2026.11.0-usb471.bin         # MaskROM recovery stage 1 (TPL/DDR init)
   u-boot-t1-2026.11.0-usb472.bin         # MaskROM recovery stage 2 (SPL + U-Boot, runs from RAM)
-  dap-os-qemu-arm64-2026.11.0.img.zst    # QEMU disk image (same layout)
-  dap-os-rootfs-arm64-2026.11.0.oci.tar  # OCI image (also pushed to ghcr.io/opendap-org/dap-os:2026.11.0, UNVERIFIED org path)
+  opendap-os-qemu-arm64-2026.11.0.img.zst    # QEMU disk image (same layout)
+  opendap-os-rootfs-arm64-2026.11.0.oci.tar  # OCI image (also pushed to ghcr.io/opendap-project/opendap-os:2026.11.0, UNVERIFIED org path)
   manifest.json, changelog.txt           # mkosi manifests
   sbom.spdx.json, sbom.cdx.json
   SOURCES.txt                            # pointer to the source archive (below)
@@ -311,7 +311,7 @@ dap-os v2026.11.0 (GitHub Release in opendap-project/dap-os, tag v2026.11.0)
 
 ### 4.7 Release procedure (no CI)
 
-Proposed `dap release` (a script in `dap-os/release/`, which a Claude Code skill wraps):
+Proposed `dap release` (a script in `opendap-os/release/`, which a Claude Code skill wraps):
 
 1. Preflight: clean git trees, tags on `system`/`board` match `packages.lock`, a hardware token is present, and `mkosi summary` is clean.
 2. Build `t1`, `qemu` and `oci` profiles from the pinned inputs.
@@ -321,7 +321,7 @@ Proposed `dap release` (a script in `dap-os/release/`, which a Claude Code skill
 6. Sign the FIT (done during build, via token), RAUC bundle, `SHA256SUMS` and APT `InRelease`.
 7. SBOM, release notes, source archive.
 8. `gh release create`, publish the aptly snapshot, update the signed update index for the channel (section 6.4).
-9. Tag `dap-os` and record the release in `docs/` (versions, snapshot IDs, key fingerprints).
+9. Tag `opendap-os` and record the release in `docs/` (versions, snapshot IDs, key fingerprints).
 
 ---
 
@@ -336,14 +336,14 @@ Proposed `dap release` (a script in `dap-os/release/`, which a Claude Code skill
 | **U-Boot `ums`** (USB mass storage) | U-Boot `ums 0 mmc 0` ([doc](https://docs.u-boot.org/en/latest/usage/cmd/ums.html)); host `bmaptool copy` 3.9.0 or `dd` | U-Boot running | The eMMC appears as a disk on any OS; Etcher-compatible | Raw-disk writes need sudo on macOS/Linux; bmaptool on macOS raw devices is **UNVERIFIED** |
 | **fastboot** (U-Boot) | `fastboot` (trixie 1:34.0.5) | U-Boot running | Familiar to Android devs | Another protocol to support; no advantage over rockusb/ums |
 | **SD card** | balenaEtcher v2.1.8, `bmaptool`, `dd` | an SD slot (not decided for the T1, Q5); the BootROM boot order must reach SD | Simplest for end users | Needs a slot; the BootROM prefers eMMC if bootable (**UNVERIFIED** RK3566 boot order details) |
-| **Self-update from DAP OS** | RAUC (section 6) | a working OS | No host needed | Not for first flash or recovery |
+| **Self-update from OpenDAP OS** | RAUC (section 6) | a working OS | No host needed | Not for first flash or recovery |
 
 ### 5.2 Recommendation: one command, `dap flash`
 
-`dap flash [--image dap-os-t1-<ver>.img.zst] [--recovery]` in `toolkit`, Rust, built on the `rockusb` crate (nusb backend, so no libusb and no sudo on macOS, and on Linux only a udev rule shipped by `host/setup.sh`):
+`dap flash [--image opendap-os-t1-<ver>.img.zst] [--recovery]` in `toolkit`, Rust, built on the `rockusb` crate (nusb backend, so no libusb and no sudo on macOS, and on Linux only a udev rule shipped by `host/setup.sh`):
 
-1. Detect the device: Rockchip VID `0x2207` in MaskROM, U-Boot rockusb, or a running DAP OS reachable via NCM/mDNS.
-2. If DAP OS is running, ask it to reboot into the U-Boot rockusb gadget (a signed request through the `dap` API, or `reboot bootloader` mapped to a U-Boot env flag).
+1. Detect the device: Rockchip VID `0x2207` in MaskROM, U-Boot rockusb, or a running OpenDAP OS reachable via NCM/mDNS.
+2. If OpenDAP OS is running, ask it to reboot into the U-Boot rockusb gadget (a signed request through the `dap` API, or `reboot bootloader` mapped to a U-Boot env flag).
 3. If in MaskROM, push `usb471` + `usb472` (versions from the release) so U-Boot runs from RAM and enters `rockusb` automatically (U-Boot env/script for the MaskROM build, **proposal**).
 4. Verify `SHA256SUMS` + minisig, then `write-bmap` the `.img.zst`. Read back the GPT and a sample of hashes.
 5. Reboot. Wait for the device to appear over NCM, and print the version.
@@ -394,7 +394,7 @@ Fallbacks:
 ### 6.2 Slot model
 
 - `system.conf`:
-  - `compatible=dap-os-t1` (dev images use `dap-os-t1-dev`);
+  - `compatible=opendap-os-t1` (dev images use `opendap-os-t1-dev`);
   - `bootloader=uboot`;
   - slot classes `boot` (vfat FIT), `rootfs` (erofs) and `verity` (hash partition), each with `.0`/`.1` instances, the verity slot `parent=rootfs`.
 - The data partition is never touched by RAUC. Migrations of `/var` state run as versioned systemd units on first boot of a new slot.
@@ -437,10 +437,10 @@ Fallbacks:
 
 ### 6.6 Update server and security cadence
 
-- **Origin:** static files, `https://<update-host>/dap-os/<sku>/<channel>/index.json` (hostname not decided). The index is signed (minisign or JWS) and lists version, `compatible`, the bundle URL + SHA-256, minimum source version (if any) and release-notes URL.
+- **Origin:** static files, `https://<update-host>/opendap-os/<sku>/<channel>/index.json` (hostname not decided). The index is signed (minisign or JWS) and lists version, `compatible`, the bundle URL + SHA-256, minimum source version (if any) and release-notes URL.
 - **Bundle hosting:** RAUC streaming needs **HTTP Range** support and benefits from HTTP/2. GitHub Release downloads redirect to a CDN, and whether that serves Range reliably for streaming is **UNVERIFIED**. **Recommendation:** devices always fetch through the **package endpoint** configured in the image (SYS-011), which must serve HTTP Range. A recalled version disappears from the signed index, and the device refuses it.
 - **Device-side client:** a small Rust `dap-updated` service. It polls the index, checks the signature, checks the battery/power policy, calls RAUC over D-Bus, reports progress to the UI and runs the health gate. No hawkBit is needed.
-- **Security cadence without CI:** `dap-os/release/security-watch` (**proposal**) compares the latest release's `manifest.json` with the [Debian security tracker JSON](https://security-tracker.debian.org/tracker/data/json) (**UNVERIFIED** current URL). It prints affected packages and a suggested urgency. Run it weekly from a launchd/systemd timer on a maintainer's machine, or as a Claude Code skill. A hit triggers a point release (`2026.11.1`). Without this, the security response depends entirely on someone remembering. The maintainers should accept that risk explicitly.
+- **Security cadence without CI:** `opendap-os/release/security-watch` (**proposal**) compares the latest release's `manifest.json` with the [Debian security tracker JSON](https://security-tracker.debian.org/tracker/data/json) (**UNVERIFIED** current URL). It prints affected packages and a suggested urgency. Run it weekly from a launchd/systemd timer on a maintainer's machine, or as a Claude Code skill. A hit triggers a point release (`2026.11.1`). Without this, the security response depends entirely on someone remembering. The maintainers should accept that risk explicitly.
 
 ---
 
@@ -452,7 +452,7 @@ Fallbacks:
 2. **One daemon owns these lines.** `dap-chipd` (name is a proposal) is a Rust service in `system`. It holds the GPIO lines (via the character device, e.g. the `gpiocdev` crate; trixie `libgpiod3` 2.2.1) and serialises access per chip. It exposes a bus API: `list`, `info`, `reset`, `enter-boot`, `flash` (signed firmware only, unless in developer mode), `console`, `debug-session` (starts a GDB/DAP server bound to localhost). It calls the backend tools below.
 3. **Chip topology comes from data, not code:** a machine-readable **board description** (in `board`) and, for HATs, a **debug-topology section of the capability manifest** (in `hat-standard`). Both list chip, interface, pins/bus, IDs, tool and firmware source.
 
-### 7.2 Tools to package in DAP OS
+### 7.2 Tools to package in OpenDAP OS
 
 | Purpose | Tool | Upstream (2026-10-21) | Debian trixie | Recommendation |
 |---|---|---|---|---|
@@ -523,7 +523,7 @@ The manifest is signed (HCS-010), and `dap-chipd` only acts on verified manifest
 **Recommendation:** treat the HAT SoC like the T1 treats itself.
 
 1. Wire its **USB OTG** to the T1's USB host, and its **maskrom/recovery strap**, **reset**, **power enable** and **debug UART** to the SoC, as in the table in 7.3.
-2. **Boot over USB from DAP OS:**
+2. **Boot over USB from OpenDAP OS:**
    - Rockchip: `rockusb` with a usb471/usb472 pair;
    - Allwinner: `sunxi-fel`;
    - NXP: `uuu`;
@@ -585,10 +585,10 @@ Safety constraints for the board:
  ───────────────────────────────────────                                         ──────────────────────────────
  system/ (Rust)  ──cargo test──► cargo-deb ──► aptly repo "dap" ──snapshot──┐
  board/  (DTS, RP fw) ─► dap-t1-dtb.deb, rp-fw (picotool seal --sign) ──────┤
- dap-os/overlays ─► dap-os-config.deb ──────────────────────────────────────┤
+ opendap-os/overlays ─► opendap-os-config.deb ──────────────────────────────────────┤
  hats/*, faceplates/* ─► signed firmware + manifests ───────────────────────┼──► firmware index / capability repo
                                                                             │
- dap-os/image (mkosi) + Debian Snapshot= + aptly snapshot ──────────────────┘
+ opendap-os/image (mkosi) + Debian Snapshot= + aptly snapshot ──────────────────┘
         │  (builder VM: Lima vz, arm64 native)
         ├─► profile oci  ──► OCI image ──► docker/OrbStack/nspawn: service tests
         ├─► profile qemu ──► disk image ──► QEMU+HVF (fast: UKI; fidelity: U-Boot) ── OTA/rollback tests
@@ -600,7 +600,7 @@ Safety constraints for the board:
                                    ├─► aptly publish (InRelease signed) ───────────────────────────► <apt-host>
                                    └─► signed update index (channel) ──────────────────────────────► <update-host>
                                                                                                          │
- device (T1, DAP OS)                                                                                     │ via package endpoint
+ device (T1, OpenDAP OS)                                                                                     │ via package endpoint
  ───────────────────                                                                                     │ (HTTP Range, recalls)
  dap-updated ──poll index──► RAUC stream install (adaptive) ──► U-Boot bootmeth_rauc try ──► health gate ─┴─ mark-good / rollback
  orchestrator ──HAT EEPROM manifest verify──► capability fetch (well-known HTTP) ──► sandboxed run
@@ -611,13 +611,13 @@ Safety constraints for the board:
 
 | Repo | Owns |
 |---|---|
-| **dap-os** | mkosi definition and profiles, repart layout, `packages.lock`, `dap-os-config` package (from `overlays/`), RAUC `system.conf` + public keyring, U-Boot boot script source, FIT assembly script, `release/` scripts (build, sign, SBOM, notes, sources, publish, security-watch), update-index format, public key fingerprints, release records in `docs/` |
+| **opendap-os** | mkosi definition and profiles, repart layout, `packages.lock`, `opendap-os-config` package (from `overlays/`), RAUC `system.conf` + public keyring, U-Boot boot script source, FIT assembly script, `release/` scripts (build, sign, SBOM, notes, sources, publish, security-watch), update-index format, public key fingerprints, release records in `docs/` |
 | **system** | Rust services, orchestrator, UI, SDK; `dap-updated`, `dap-chipd`, capability runtime + manifest verification; cargo-deb metadata; bus/API schemas that capabilities depend on |
 | **toolkit** | `dap` CLI (`crates/dap`: builder, build, vm, ssh, console, deploy, debug, flash, chip, release wrappers); `host/setup.sh` + Brewfile additions (lima, rockusb, mkosi provisioning for the builder VM, QEMU EDK2/U-Boot firmware); pre-commit hooks (mkosi config check, `cargo deny`, REUSE); udev rules for Linux hosts |
 | **board** | T1 device tree + overlays (`dap-t1-dtb` package), board description (chips, wiring, debug topology), RP coprocessor firmware + its signing manifest, flashing/recovery hardware requirements (MaskROM button, recovery key, OTG, debug lines) |
 | **hat-standard** | EEPROM layout, capability manifest schema including the debug-topology section, signing scheme, HAT_BOOT#/SWD/UART pin roles |
 | **hats/***, **faceplates** | Chip firmware sources, signed release artifacts, EEPROM manifest content, HAT DT overlays (first-party), companion-SoC image profiles if any |
-| **claude-plugins** | Claude Code skills wrapping the above (`/dap-os:build`, `/dap-os:release`, `/dap-os:release-notes`, `/dap:flash`, `/dap-os:security-watch`), **proposal** |
+| **claude-plugins** | Claude Code skills wrapping the above (`/opendap-os:build`, `/opendap-os:release`, `/opendap-os:release-notes`, `/dap:flash`, `/opendap-os:security-watch`), **proposal** |
 | **rfcs** | Cross-repo decisions coming out of this report (key hierarchy, update model, capability bundle format) |
 | boot chain (separate research) | U-Boot/TF-A/rkbin builds, usb471/472 images, FIT verification config, optional OTP locking. Possibly a dedicated `boot-firmware` repo, as the toolkit report suggests |
 
@@ -639,7 +639,7 @@ Safety constraints for the board:
 ## 10. Open questions for the maintainers
 
 - **Q1.** Does "updates from the Linux distribution repositories" (OS-013) accept Debian updates delivered **inside signed images**, with apt only in developer mode?
-- **Q2.** Should DAP OS be verified-but-unlocked (user-ownable keys, no OTP fuse), or offer an irreversible locked mode? (Boot-chain research.)
+- **Q2.** Should OpenDAP OS be verified-but-unlocked (user-ownable keys, no OTP fuse), or offer an irreversible locked mode? (Boot-chain research.)
 - **Q3.** U-Boot update strategy: does the RK3566 BootROM try backup idbloader copies? Is SPI NOR planned as a separate boot medium? (Boot-chain research, **UNVERIFIED**.)
 - **Q4.** How are third-party HAT device-tree overlays trusted, given that U-Boot applies overlays and they are not part of the image's signed FIT?
 - **Q5.** Does the T1 have an SD card slot (end-user flashing and recovery path)? What eMMC size (sets the A/B slot sizes)?

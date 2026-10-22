@@ -1,23 +1,23 @@
-# DAP OS requirements
+# OpenDAP OS requirements
 
-Requirements for the DAP OS distribution.
+Requirements for the OpenDAP OS distribution.
 
 | ID | Requirement | Priority | Status |
 |---|---|---|---|
-| OS-001 | DAP OS shall run a mainline Linux kernel, version 7 or later. | must | Confirmed |
-| OS-002 | DAP OS shall not require custom kernel builds. | must | Confirmed |
-| OS-003 | DAP OS shall stay desktop-style, not embedded-style. | must | Confirmed |
-| OS-004 | DAP OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
-| OS-005 | DAP OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
-| OS-006 | DAP OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
+| OS-001 | OpenDAP OS shall run a mainline Linux kernel, version 7 or later. | must | Confirmed |
+| OS-002 | OpenDAP OS shall not require custom kernel builds. | must | Confirmed |
+| OS-003 | OpenDAP OS shall stay desktop-style, not embedded-style. | must | Confirmed |
+| OS-004 | OpenDAP OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
+| OS-005 | OpenDAP OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
+| OS-006 | OpenDAP OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
 | OS-007 | The kernel shall be updatable as a prebuilt package. | should | Draft |
-| OS-008 | DAP OS shall be the real host of all peripheral hardware on the board and on HATs: it shall flash, operate and debug every programmable chip (microcontrollers, FPGAs, other SoCs), including the board's RP coprocessor. | must | Confirmed |
-| OS-009 | Developers shall be able to run DAP OS on their host machine (container or QEMU), connect to it and control it, and change it through code and configuration files. | must | Confirmed |
-| OS-010 | DAP OS shall be built up from code and configuration, with OpenDAP software and drivers preinstalled, into a final image. | must | Confirmed |
+| OS-008 | OpenDAP OS shall be the real host of all peripheral hardware on the board and on HATs: it shall flash, operate and debug every programmable chip (microcontrollers, FPGAs, other SoCs), including the board's RP coprocessor. | must | Confirmed |
+| OS-009 | Developers shall be able to run OpenDAP OS on their host machine (container or QEMU), connect to it and control it, and change it through code and configuration files. | must | Confirmed |
+| OS-010 | OpenDAP OS shall be built up from code and configuration, with OpenDAP software and drivers preinstalled, into a final image. | must | Confirmed |
 | OS-011 | Images shall be signed, versioned and published as releases. | must | Confirmed |
 | OS-012 | Flashing a release image shall be simple and direct. | must | Confirmed |
-| OS-013 | DAP OS shall receive updates both from the Linux distribution repositories and from OpenDAP software repositories. | must | Confirmed |
-| OS-014 | DAP OS should support over-the-air (OTA) updates. | should | Draft |
+| OS-013 | OpenDAP OS shall receive updates both from the Linux distribution repositories and from OpenDAP software repositories. | must | Confirmed |
+| OS-014 | OpenDAP OS should support over-the-air (OTA) updates. | should | Draft |
 | OS-015 | Development tools that are not for end users (for example OpenOCD) shall come from a separate OpenDAP repository: available and tested on the device, not installed by default. | must | Confirmed |
 | OS-016 | Headless development and automation shall run on QEMU; UI work may use UTM. | must | Confirmed |
 | OS-017 | Recovery: the device shall be recoverable from MaskROM, and A/B updates shall roll back automatically when a new version fails. | must | Draft |

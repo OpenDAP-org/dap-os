@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run the virtual T1 (DAP OS qemu image) on the host with QEMU, headless.
+# Run the virtual T1 (OpenDAP OS qemu image) on the host with QEMU, headless.
 # Usage: build/dap-qemu.sh start|stop|ssh [command…]|console
 #   start    boot in the background. Virtual T1 hardware: 4 GB RAM, 32 GB disk, 320x480 portrait display (virtio-gpu),
 #            touch screen (virtio-multitouch), the four buttons (virtio-keyboard), audio out (virtio-sound).
@@ -10,7 +10,7 @@ set -eu
 here="$(cd "$(dirname "$0")" && pwd)"
 repo="$(cd "$here/.." && pwd)"
 run="$here/run"; port="${DAP_SSH_PORT:-2222}"; vnc="${DAP_VNC_DISPLAY:-0}"
-image="$repo/image/mkosi.output/dap-os-qemu.raw"
+image="$repo/image/mkosi.output/opendap-os-qemu.raw"
 disk="$run/disk.qcow2"   # 32 GB like the T1, backed by the built image
 key="$here/dev-ssh/id_ed25519"
 fw_code="$(brew --prefix qemu 2>/dev/null)/share/qemu/edk2-aarch64-code.fd"

@@ -1,6 +1,6 @@
-# Lima VM used to build DAP OS images on macOS (Apple Silicon) or Linux.
-#   limactl start --name=dapos-build build/lima/dapos-build.yaml
-# Debian 13 (trixie) arm64, the same distribution DAP OS is built from.
+# Lima VM used to build OpenDAP OS images on macOS (Apple Silicon) or Linux.
+#   limactl start --name=opendap-os-build build/lima/opendap-os-build.yaml
+# Debian 13 (trixie) arm64, the same distribution OpenDAP OS is built from.
 minimumLimaVersion: 2.0.0
 base:
 - template:_images/debian-13
