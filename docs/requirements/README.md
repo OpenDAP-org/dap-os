@@ -26,9 +26,11 @@ Requirements for the OpenDAP OS distribution.
 | OS-020 | Playback shall be bit-perfect, including DSD (native and DoP). | must | Confirmed |
 | OS-021 | The default image shall contain only what is mandatory; optional components (for example LLVM) shall be installable from the OpenDAP repositories instead. | must | Confirmed |
 | OS-022 | The T1 shall use SD/TF storage both directly and through cache or preload levels in eMMC and RAM. | must | Confirmed |
+| OS-023 | OpenDAP OS shall provide its own optimised builds of Linux packages where that serves the device (tuned for the SoC, trimmed dependencies, patches carried until upstream), from the OpenDAP repositories, instead of relying only on stock distribution packages. | must | Confirmed |
 
 ## Context
 
+- OS-023 (maintainers, 2026-10-22): the intent is OpenDAP's own optimised versions of Linux packages, not only stock packages. Debian stays the base (ADR 0002); optimised builds are published as normal packages in the OpenDAP repositories, reproducible and with their sources.
 - Base distribution: Debian trixie with the backports kernel ([ADR 0002](../adr/0002-debian-trixie-with-backports-kernel.md)).
 - OS-017: Adopted from the earlier experiments on 2026-10-21 as **Draft**: consistent with the decisions already taken and with the product philosophy, pending the maintainers' confirmation. Part availability still has to be checked against the sourcing rule (T1-010).
 - The virtual T1 emulates the battery with the kernel's `test_power` module, built at image time against the image's own kernel headers (qemu profile only, [ADR 0007](../adr/0007-kernel-modules-through-dkms.md)): `test_battery`, `test_ac` and `test_usb` appear in `/sys/class/power_supply`, driven through `/sys/module/test_power/parameters/` (capacity, status, AC/USB online, voltage, current).
