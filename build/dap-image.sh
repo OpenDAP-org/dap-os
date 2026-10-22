@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build a OpenDAP OS image inside the Debian build VM.
+# Build an OpenDAP OS image inside the Debian build VM.
 # Usage: build/dap-image.sh [profile]   (default: qemu)
 set -eu
 profile="${1:-qemu}"
