@@ -1,0 +1,4 @@
+#!/bin/sh
+# Register modules added by the build scripts (test_power.ko).
+set -eu
+for kver in $(ls /usr/lib/modules); do depmod -a "$kver"; done

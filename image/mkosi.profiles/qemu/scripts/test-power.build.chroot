@@ -1,0 +1,17 @@
+#!/bin/sh
+# Virtual T1 only: emulate the battery with the kernel's test_power module, so OpenDAP OS sees a
+# real power_supply device in /sys/class/power_supply (OS-018). Debian does not build this module,
+# so it is built here against the image's own kernel headers (opendap-os ADR 0007).
+set -eu
+url="https://raw.githubusercontent.com/torvalds/linux/v7.2/drivers/power/supply/test_power.c"
+sha256="df113a2b7c784ed9c6e8a801ce72de5eefe3eb466c733d6ecf923f4fbe6bbc50"
+src=/usr/src/test_power
+mkdir -p "$src"
+curl -fsSL "$url" -o "$src/test_power.c"
+echo "$sha256  $src/test_power.c" | sha256sum -c -
+echo 'obj-m := test_power.o' > "$src/Kbuild"
+for kver in $(ls /usr/lib/modules); do
+  make -C "/usr/src/linux-headers-$kver" M="$src" modules
+  install -D -m 0644 "$src/test_power.ko" "$DESTDIR/usr/lib/modules/$kver/updates/test_power.ko"
+  make -C "/usr/src/linux-headers-$kver" M="$src" clean
+done
