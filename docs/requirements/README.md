@@ -10,7 +10,7 @@ Requirements for the OpenDAP OS distribution.
 | OS-004 | OpenDAP OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
 | OS-005 | OpenDAP OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
 | OS-006 | OpenDAP OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
-| OS-007 | The kernel shall be updatable as a prebuilt package. | should | Draft |
+| OS-007 | The kernel shall be updatable as a prebuilt package. | must | Draft |
 | OS-008 | OpenDAP OS shall be the real host of all peripheral hardware on the board and on HATs: it shall flash, operate and debug every programmable chip (microcontrollers, FPGAs, other SoCs), including the board's RP coprocessor. | must | Confirmed |
 | OS-009 | Developers shall be able to run OpenDAP OS on their host machine (container or QEMU), connect to it and control it, and change it through code and configuration files. | must | Confirmed |
 | OS-010 | OpenDAP OS shall be built up from code and configuration, with OpenDAP software and drivers preinstalled, into a final image. | must | Confirmed |
