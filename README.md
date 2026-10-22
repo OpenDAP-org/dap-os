@@ -1,6 +1,6 @@
 # OpenDAP OS
 
-Official distribution: image build, per-SKU profiles and releases.
+OpenDAP OS, the operating system of the OpenDAP T1: image build, per-SKU profiles and releases.
 
 ## Layout
 
