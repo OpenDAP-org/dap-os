@@ -43,10 +43,14 @@ def main(a):
         key(q, BUTTONS[a[1]], True); time.sleep(hold / 1000); key(q, BUTTONS[a[1]], False)
     elif a[0] == "tap":
         x, y = int(a[1]), int(a[2]); sx, sy = x * 0x7FFF // (WIDTH - 1), y * 0x7FFF // (HEIGHT - 1)
-        ev = lambda down: [{"type": "abs", "data": {"axis": "x", "value": sx}},
-                           {"type": "abs", "data": {"axis": "y", "value": sy}},
-                           {"type": "btn", "data": {"down": down, "button": "touch"}}]
-        q.cmd("input-send-event", events=ev(True)); time.sleep(0.05); q.cmd("input-send-event", events=ev(False))
+        # virtio-multitouch takes multi-touch ("mtt") events, not pointer "abs" events. Known limit (QEMU 11.1.2):
+        # the position reaches the guest, but begin/end (slot, tracking id) do not, so a full touch contact needs
+        # in-guest injection through uinput; planned with the UI runtime.
+        mtt = lambda kind, axis="x", value=0: {"type": "mtt", "data": {"type": kind, "slot": 0, "tracking-id": 1, "axis": axis, "value": value}}
+        q.cmd("input-send-event", events=[mtt("begin", "x", sx), mtt("data", "x", sx), mtt("data", "y", sy),
+                                          {"type": "btn", "data": {"down": True, "button": "touch"}}])
+        time.sleep(0.05)
+        q.cmd("input-send-event", events=[mtt("end", "x", sx), {"type": "btn", "data": {"down": False, "button": "touch"}}])
     elif a[0] == "raw":
         print(json.dumps(q.cmd(a[1], **(json.loads(a[2]) if len(a) > 2 else {})), indent=2))
     else:
