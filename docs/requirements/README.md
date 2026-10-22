@@ -27,15 +27,16 @@ Requirements for the OpenDAP OS distribution.
 | OS-021 | The default image shall contain only what is mandatory; optional components (for example LLVM) shall be installable from the OpenDAP repositories instead. | must | Confirmed |
 | OS-022 | The T1 shall use SD/TF storage both directly and through cache or preload levels in eMMC and RAM. | must | Confirmed |
 
-## Open questions
-
-- Base distribution: Debian or Alpine.
-
 ## Context
 
-- Base distribution candidates under review: Armbian, Alpine and others; see `docs/research/` when available.
-- OS-017 to OS-017: Adopted from the earlier experiments on 2026-10-21 as **Draft**: consistent with the decisions already taken and with the product philosophy, pending the maintainers' confirmation. Part availability still has to be checked against the sourcing rule (T1-010).
+- Base distribution: Debian trixie with the backports kernel ([ADR 0002](../adr/0002-debian-trixie-with-backports-kernel.md)).
+- OS-017: Adopted from the earlier experiments on 2026-10-21 as **Draft**: consistent with the decisions already taken and with the product philosophy, pending the maintainers' confirmation. Part availability still has to be checked against the sourcing rule (T1-010).
 - The virtual T1 has no battery yet: the Debian kernel does not build the `test_power` module, so battery emulation will come from an OpenDAP service.
 - Pending: deep suspend (suspend-to-RAM) on the RK3566 depends on mainline TF-A support, not verified yet. Not a priority for now, but must be revisited.
 - Audio direction from the image-composition research: PipeWire processes audio as 32-bit float, so bit-perfect 32-bit PCM and DSD need a playback engine with exclusive, direct ALSA access, next to PipeWire for shared use.
 - Image size: acceptable as long as it works well and is not excessive for the device; reduce further only if needed. Dropping LLVM by default may require an OpenDAP build of Mesa limited to Panfrost, because Debian's Mesa depends on LLVM.
+- **T1 hardware needs from board BOM v1.1** (`board/docs/specs/bom-v1.md`), to carry into the image:
+  - DKMS modules ([ADR 0007](../adr/0007-kernel-modules-through-dkms.md)): `cs43130` (CS43198 DACs), `max17042_battery` (MAX17055 fuel gauge), `nxpwifi` and `btnxpuart` (IW612), and `panel-ilitek-ili9488` for the touch faceplate display until Debian ships a kernel ≥ 7.3.
+  - BQ25895 charger: its watchdog restores a 2048 mA charge current when it expires, so the charger driver or an OpenDAP OS service must keep it serviced or disable it. Whether the mainline `bq25890_charger` driver does this is **UNVERIFIED**.
+  - INA236 current monitors power up converting continuously; they are configured at boot.
+  - RP2354A coprocessor firmware must select 1.8 V I/O (`VOLTAGE_SELECT = 1`).
