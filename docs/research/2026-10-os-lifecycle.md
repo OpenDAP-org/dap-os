@@ -3,7 +3,7 @@
 - **Date:** 2026-10-21
 - **Status:** research, not a decision. Everything labelled **Recommendation** is a proposal for the maintainers to decide on. Nothing here changes an ADR.
 - **Scope:** the full OpenDAP OS lifecycle (development, image build, signing, release, flashing, OTA updates) and how OpenDAP OS hosts every programmable peripheral chip on the board and on HATs.
-- **Related:** [`2026-10-base-distribution.md`](2026-10-base-distribution.md), ADR 0001/0002 in [`../adr/`](../adr/), board ADR 0003 (RK3566), `toolkit/docs/research/2026-10-software-firmware-toolchain.md` (it overlaps sections 1, 4 and 6 of this report; this report goes deeper and is consistent with it unless stated).
+- **Related:** [`2026-10-base-distribution.md`](2026-10-base-distribution.md), ADR 0001/0002 in [`../adr/`](../adr/), board ADR 0003 (RK3566), `toolkit/host/docs/research/2026-10-software-firmware-toolchain.md` (it overlaps sections 1, 4 and 6 of this report; this report goes deeper and is consistent with it unless stated).
 
 ## 0. Inputs
 
@@ -88,7 +88,7 @@ The QEMU fast path (`Bootloader=uki`, EDK2 from Homebrew's QEMU) boots in second
 
 ### 2.3 Connecting to and controlling a running instance
 
-**Recommendation:** add a `dap` CLI as a Rust crate in `toolkit/crates/dap`. It is a thin wrapper and every step stays a plain, documented command underneath.
+**Recommendation:** add a `dap` CLI as a Rust crate in `toolkit/cli/crates/dap`. It is a thin wrapper and every step stays a plain, documented command underneath.
 
 | Command | What it does |
 |---|---|
