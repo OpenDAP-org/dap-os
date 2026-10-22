@@ -28,6 +28,9 @@ Requirements for the OpenDAP OS distribution.
 | OS-022 | The T1 shall use SD/TF storage both directly and through cache or preload levels in eMMC and RAM. | must | Confirmed |
 | OS-023 | OpenDAP OS shall provide its own optimised builds of Linux packages where that serves the device (tuned for the SoC, trimmed dependencies, patches carried until upstream), from the OpenDAP repositories, instead of relying only on stock distribution packages. | must | Confirmed |
 | OS-024 | The default image shall contain only OpenDAP's own ecosystem. Third-party software is never installed by default. Advanced packages outside the audiophile core (for example the software of special HATs) shall come from a separate OpenDAP repository and are not installed by default. | must | Confirmed |
+| OS-025 | If verified boot is ever enforced, the owner shall be able to enrol their own keys or turn enforcement off, without losing data. | must | Confirmed |
+| OS-026 | MQA files shall play as plain PCM, with no MQA decoding or rendering. | must | Confirmed |
+| OS-027 | Third-party services and certifications (AirPlay, Roon Ready, Spotify, Tidal or Qobuz Connect, an LDAC receiver) are not part of the official image by default; each is evaluated on its own (SYS-035). | must | Confirmed |
 
 ## Context
 
