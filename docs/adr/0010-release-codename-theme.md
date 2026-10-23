@@ -1,6 +1,6 @@
 # ADR 0010: Release codename theme
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR 0011](0011-blackbird-os.md)
 - **Date:** 2026-10-22
 
 ## Context

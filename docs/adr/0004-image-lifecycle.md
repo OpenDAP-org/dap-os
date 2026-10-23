@@ -5,7 +5,7 @@
 
 ## Context
 
-OpenDAP OS is built from code and configuration (OS-010), runs on developer hosts (OS-009, OS-016), ships as signed, versioned releases (OS-011), flashes simply (OS-012) and updates from Debian and OpenDAP repositories (OS-013), likely over the air (OS-014). Research: [`../research/2026-10-os-lifecycle.md`](../research/2026-10-os-lifecycle.md).
+Blackbird OS is built from code and configuration (OS-010), runs on developer hosts (OS-009, OS-016), ships as signed, versioned releases (OS-011), flashes simply (OS-012) and updates from Debian and OpenDAP repositories (OS-013), likely over the air (OS-014). Research: [`../research/2026-10-os-lifecycle.md`](../research/2026-10-os-lifecycle.md).
 
 ## Decision
 

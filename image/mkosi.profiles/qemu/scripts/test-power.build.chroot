@@ -1,7 +1,7 @@
 #!/bin/sh
-# Virtual T1 only: emulate the battery with the kernel's test_power module, so OpenDAP OS sees a
+# Virtual T1 only: emulate the battery with the kernel's test_power module, so Blackbird OS sees a
 # real power_supply device in /sys/class/power_supply (OS-018). Debian does not build this module,
-# so it is built here against the image's own kernel headers (opendap-os ADR 0007).
+# so it is built here against the image's own kernel headers (blackbird-os ADR 0007).
 set -eu
 url="https://raw.githubusercontent.com/torvalds/linux/v7.2/drivers/power/supply/test_power.c"
 sha256="df113a2b7c784ed9c6e8a801ce72de5eefe3eb466c733d6ecf923f4fbe6bbc50"

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build an OpenDAP OS image inside the Debian build VM.
+# Build an Blackbird OS image inside the Debian build VM.
 # Usage: build/dap-image.sh [profile]   (default: qemu)
 set -eu
 profile="${1:-qemu}"
@@ -11,7 +11,7 @@ if [ "$profile" = qemu ]; then
   key="$here/dev-ssh/id_ed25519"
   if [ ! -f "$key" ]; then
     mkdir -p "$here/dev-ssh"
-    ssh-keygen -q -t ed25519 -N "" -C "opendap-os development" -f "$key"
+    ssh-keygen -q -t ed25519 -N "" -C "blackbird-os development" -f "$key"
   fi
   mkdir -p "$here/dev-ssh/tree/root/.ssh"
   cp "$key.pub" "$here/dev-ssh/tree/root/.ssh/authorized_keys"
@@ -19,10 +19,10 @@ if [ "$profile" = qemu ]; then
 fi
 
 # Create the build VM on first use; start it if it exists but is stopped.
-if ! limactl list -q 2>/dev/null | grep -qx opendap-os-build; then
-  limactl start --name=opendap-os-build --tty=false "$here/lima/opendap-os-build.yaml"
-elif [ "$(limactl list --format '{{.Status}}' opendap-os-build)" != Running ]; then
-  limactl start --tty=false opendap-os-build
+if ! limactl list -q 2>/dev/null | grep -qx blackbird-os-build; then
+  limactl start --name=blackbird-os-build --tty=false "$here/lima/blackbird-os-build.yaml"
+elif [ "$(limactl list --format '{{.Status}}' blackbird-os-build)" != Running ]; then
+  limactl start --tty=false blackbird-os-build
 fi
-limactl shell opendap-os-build -- sudo mkosi -C "$repo/image" --profile="$profile" -f build
+limactl shell blackbird-os-build -- sudo mkosi -C "$repo/image" --profile="$profile" -f build
 ls -lh "$repo/image/mkosi.output/"

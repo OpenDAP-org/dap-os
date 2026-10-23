@@ -1,6 +1,6 @@
-# Lima VM used to build OpenDAP OS images on macOS (Apple Silicon) or Linux.
-#   limactl start --name=opendap-os-build build/lima/opendap-os-build.yaml
-# Debian 13 (trixie) arm64, the same distribution OpenDAP OS is built from.
+# Lima VM used to build Blackbird OS images on macOS (Apple Silicon) or Linux.
+#   limactl start --name=blackbird-os-build build/lima/blackbird-os-build.yaml
+# Debian 13 (trixie) arm64, the same distribution Blackbird OS is built from.
 minimumLimaVersion: 2.0.0
 base:
 - template:_images/debian-13

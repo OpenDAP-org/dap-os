@@ -1,4 +1,4 @@
-# Take the kernel from trixie-backports (mainline 7.x, opendap-os ADR 0002).
+# Take the kernel from trixie-backports (mainline 7.x, blackbird-os ADR 0002).
 Package: linux-image-* linux-headers-* linux-kbuild-* linux-base
 Pin: release n=trixie-backports
 Pin-Priority: 990

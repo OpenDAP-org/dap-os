@@ -1,23 +1,23 @@
-# OpenDAP OS requirements
+# Blackbird OS requirements
 
-Requirements for the OpenDAP OS distribution.
+Requirements for the Blackbird OS distribution.
 
 | ID | Requirement | Priority | Status |
 |---|---|---|---|
-| OS-001 | OpenDAP OS shall run a mainline Linux kernel, version 7 or later. | must | Confirmed |
-| OS-002 | OpenDAP OS shall not require custom kernel builds. | must | Confirmed |
-| OS-003 | OpenDAP OS shall stay desktop-style, not embedded-style. | must | Confirmed |
-| OS-004 | OpenDAP OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
-| OS-005 | OpenDAP OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
-| OS-006 | OpenDAP OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
+| OS-001 | Blackbird OS shall run a mainline Linux kernel, version 7 or later. | must | Confirmed |
+| OS-002 | Blackbird OS shall not require custom kernel builds. | must | Confirmed |
+| OS-003 | Blackbird OS shall stay desktop-style, not embedded-style. | must | Confirmed |
+| OS-004 | Blackbird OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
+| OS-005 | Blackbird OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
+| OS-006 | Blackbird OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
 | OS-007 | The kernel shall be updatable as a prebuilt package. | must | Draft |
-| OS-008 | OpenDAP OS shall be the real host of all peripheral hardware on the board and on HATs: it shall flash, operate and debug every programmable chip (microcontrollers, FPGAs, other SoCs), including the board's RP coprocessor. | must | Confirmed |
-| OS-009 | Developers shall be able to run OpenDAP OS on their host machine (container or QEMU), connect to it and control it, and change it through code and configuration files. | must | Confirmed |
-| OS-010 | OpenDAP OS shall be built up from code and configuration, with OpenDAP software and drivers preinstalled, into a final image. | must | Confirmed |
+| OS-008 | Blackbird OS shall be the real host of all peripheral hardware on the board and on HATs: it shall flash, operate and debug every programmable chip (microcontrollers, FPGAs, other SoCs), including the board's RP coprocessor. | must | Confirmed |
+| OS-009 | Developers shall be able to run Blackbird OS on their host machine (container or QEMU), connect to it and control it, and change it through code and configuration files. | must | Confirmed |
+| OS-010 | Blackbird OS shall be built up from code and configuration, with OpenDAP software and drivers preinstalled, into a final image. | must | Confirmed |
 | OS-011 | Images shall be signed, versioned and published as releases. | must | Confirmed |
 | OS-012 | Flashing a release image shall be simple and direct. | must | Confirmed |
-| OS-013 | OpenDAP OS shall receive updates both from the Linux distribution repositories and from OpenDAP software repositories. | must | Confirmed |
-| OS-014 | OpenDAP OS should support over-the-air (OTA) updates. | should | Draft |
+| OS-013 | Blackbird OS shall receive updates both from the Linux distribution repositories and from OpenDAP software repositories. | must | Confirmed |
+| OS-014 | Blackbird OS should support over-the-air (OTA) updates. | should | Draft |
 | OS-015 | Development tools that are not for end users (for example OpenOCD) shall come from a separate OpenDAP repository: available and tested on the device, not installed by default. | must | Confirmed |
 | OS-016 | Headless development and automation shall run on QEMU; UI work may use UTM. | must | Confirmed |
 | OS-017 | Recovery: the device shall be recoverable from MaskROM, and A/B updates shall roll back automatically when a new version fails. | must | Draft |
@@ -26,7 +26,7 @@ Requirements for the OpenDAP OS distribution.
 | OS-020 | Playback shall be bit-perfect, including DSD (native and DoP). | must | Confirmed |
 | OS-021 | The default image shall contain only what is mandatory; optional components (for example LLVM) shall be installable from the OpenDAP repositories instead. | must | Confirmed |
 | OS-022 | The T1 shall use SD/TF storage both directly and through cache or preload levels in eMMC and RAM. | must | Confirmed |
-| OS-023 | OpenDAP OS shall provide its own optimised builds of Linux packages where that serves the device (tuned for the SoC, trimmed dependencies, patches carried until upstream), from the OpenDAP repositories, instead of relying only on stock distribution packages. | must | Confirmed |
+| OS-023 | Blackbird OS shall provide its own optimised builds of Linux packages where that serves the device (tuned for the SoC, trimmed dependencies, patches carried until upstream), from the OpenDAP repositories, instead of relying only on stock distribution packages. | must | Confirmed |
 | OS-024 | The default image shall contain only OpenDAP's own ecosystem. Third-party software is never installed by default. Advanced packages outside the audiophile core (for example the software of special HATs) shall come from a separate OpenDAP repository and are not installed by default. | must | Confirmed |
 | OS-025 | If verified boot is ever enforced, the owner shall be able to enrol their own keys or turn enforcement off, without losing data. | must | Confirmed |
 | OS-026 | MQA files shall play as plain PCM, with no MQA decoding or rendering. | must | Confirmed |
@@ -36,7 +36,7 @@ Requirements for the OpenDAP OS distribution.
 
 - OS-023 (maintainers, 2026-10-22): the intent is OpenDAP's own optimised versions of Linux packages, not only stock packages. Debian stays the base (ADR 0002); optimised builds are published as normal packages in the OpenDAP repositories, reproducible and with their sources.
 - Base distribution: Debian trixie with the backports kernel ([ADR 0002](../adr/0002-debian-trixie-with-backports-kernel.md)).
-- Release codenames ([ADR 0009](../adr/0009-release-codenames.md), [ADR 0010](../adr/0010-release-codename-theme.md)): the first release is Blackbird; later ones are named after experimental and reconnaissance aircraft.
+- Name and versions ([ADR 0011](../adr/0011-blackbird-os.md), superseding ADR 0009 and ADR 0010): the system is Blackbird OS; releases are identified by version number, with no codenames.
 - OS-017: Adopted from the earlier experiments on 2026-10-21 as **Draft**: consistent with the decisions already taken and with the product philosophy, pending the maintainers' confirmation. Part availability still has to be checked against the sourcing rule (T1-010).
 - The virtual T1 emulates the battery with the kernel's `test_power` module, built at image time against the image's own kernel headers (qemu profile only, [ADR 0007](../adr/0007-kernel-modules-through-dkms.md)): `test_battery`, `test_ac` and `test_usb` appear in `/sys/class/power_supply`, driven through `/sys/module/test_power/parameters/` (capacity, status, AC/USB online, voltage, current).
 - Pending: deep suspend (suspend-to-RAM) on the RK3566 depends on mainline TF-A support, not verified yet. Not a priority for now, but must be revisited.

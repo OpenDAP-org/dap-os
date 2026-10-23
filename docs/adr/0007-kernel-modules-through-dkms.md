@@ -9,4 +9,4 @@ Several drivers the T1 needs are in mainline but not enabled in Debian's kernel 
 
 ## Decision
 
-OpenDAP OS does not depend on Debian enabling modules. When a module the T1 needs is missing, OpenDAP OS ships it through **DKMS**, built from the mainline source of that driver against Debian's kernel. The Debian kernel itself stays unmodified (OS-002).
+Blackbird OS does not depend on Debian enabling modules. When a module the T1 needs is missing, Blackbird OS ships it through **DKMS**, built from the mainline source of that driver against Debian's kernel. The Debian kernel itself stays unmodified (OS-002).

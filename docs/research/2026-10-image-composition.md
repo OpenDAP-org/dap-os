@@ -1,8 +1,8 @@
-# OpenDAP OS: image composition on Debian trixie (RK3566)
+# Blackbird OS: image composition on Debian trixie (RK3566)
 
 - **Date:** 2026-10-21
 - **Status:** research, not a decision. Everything under "Recommendation" is a recommendation for the maintainers to decide on.
-- **Scope:** which Debian components a trimmed OpenDAP OS image for an RK3566 handheld keeps, replaces or drops. The image is built from Debian 13 *trixie* plus selected *trixie-backports* packages (kernel 7.2.x, Mesa, PipeWire).
+- **Scope:** which Debian components a trimmed Blackbird OS image for an RK3566 handheld keeps, replaces or drops. The image is built from Debian 13 *trixie* plus selected *trixie-backports* packages (kernel 7.2.x, Mesa, PipeWire).
 - **Companion report:** [2026-10-base-distribution.md](2026-10-base-distribution.md) (choice of base distribution).
 
 ## 0. Inputs

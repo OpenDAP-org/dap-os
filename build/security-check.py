@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the last built OpenDAP OS image against Debian's security, updates and backports archives.
+"""Check the last built Blackbird OS image against Debian's security, updates and backports archives.
 
 Reads every built image's package manifest (image/mkosi.output/*.manifest), downloads the current
 package indexes and lists every package with a newer version available. Records the run in

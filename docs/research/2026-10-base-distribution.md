@@ -1,8 +1,8 @@
-# OpenDAP OS: base distribution research
+# Blackbird OS: base distribution research
 
 - **Date:** 2026-10-21
 - **Status:** research, not a decision. Everything under "Recommendation" is a recommendation for the maintainers to decide on.
-- **Scope:** pick the prebuilt distribution that OpenDAP OS (open-hardware handheld, Rust services, Slint/Wayland UI) gets its customized image from.
+- **Scope:** pick the prebuilt distribution that Blackbird OS (open-hardware handheld, Rust services, Slint/Wayland UI) gets its customized image from.
 
 ## 0. Constraints (from the maintainers)
 
@@ -131,7 +131,7 @@ GPU drivers in Mesa:
 
 - **Kernel:** generic `linux-postmarketos-stable` 7.2.11, `-mainline` 7.3 and `-lts` 6.18.57 on `main`; v26.06 has 7.0.12. Its aarch64 config enables the full i.MX8MP display stack and Rockchip display, but not `VIDEO_ROCKCHIP_VDEC` and not Rocket.
 - **SoC fit:** RK3566 handhelds and tablets (PineTab2, Anbernic RGxx3) are an active community area (**UNVERIFIED** current device-port status; the GitLab search API needs auth). The mainline-first policy matches our goal exactly. No RK3576 or i.MX8MP device ports were confirmed (**UNVERIFIED**).
-- **Workflow:** `pmbootstrap` installs prebuilt apks into an image. An OpenDAP OS device package (`device-opendap-*`) would carry our DTB/overlays, deviceinfo and U-Boot binary. Alternatively, plain Alpine `apk --root … --initdb add` or `alpine-make-rootfs` from prebuilt packages.
+- **Workflow:** `pmbootstrap` installs prebuilt apks into an image. An Blackbird OS device package (`device-opendap-*`) would carry our DTB/overlays, deviceinfo and U-Boot binary. Alternatively, plain Alpine `apk --root … --initdb add` or `alpine-make-rootfs` from prebuilt packages.
 - **UI stack:** Phosh, Plasma Mobile and Sxmo are available, but we would run our own compositor and Slint. systemd has been available as an option in postmarketOS since v24.12. The Alpine base itself uses OpenRC.
 - **musl implications:**
   - Mesa and PipeWire work (Alpine ships both).
@@ -178,7 +178,7 @@ GPU drivers in Mesa:
 - **They are not plain mainline.** The `patch/kernel/archive/rockchip64-7.3` directory carries **256 patches** on top of mainline, while `imx8m-7.1` carries 2 ([armbian/build](https://github.com/armbian/build/tree/main/patch/kernel/archive)). RK3576 boards in Armbian default to the **vendor** branch and the Radxa U-Boot fork (`rk35xx.conf`).
 - **Consuming without the framework:** yes, technically. The packages are standard .debs in `apt.armbian.com` (aptly; suites trixie, noble, …; arm64). An mmdebstrap'd Debian image can add that repo and install `linux-image-edge-rockchip64` and `linux-dtb-edge-rockchip64` plus `armbian-firmware`. But we would inherit Armbian's patch stack and release cadence, and we would depend on a volunteer project's repo for a shipped product.
 - **Prebuilt images:** per-board images exist; customization runs through the build framework (`customize-image.sh`, extensions), which is the "big build" style we want to avoid.
-- **Best use for OpenDAP OS:** as a **reference** for U-Boot/DDR-blob handling, board bring-up patches and firmware packaging. Not as the base.
+- **Best use for Blackbird OS:** as a **reference** for U-Boot/DDR-blob handling, board bring-up patches and firmware packaging. Not as the base.
 
 ### 4.10 Mobian
 
@@ -257,7 +257,7 @@ GPU drivers in Mesa:
 
 ---
 
-## 8. Concrete OpenDAP OS workflow (recommendation)
+## 8. Concrete Blackbird OS workflow (recommendation)
 
 This section is written for Rank 1 and Rank 2 side by side. Both are glibc/systemd, so the DAP layer is identical.
 

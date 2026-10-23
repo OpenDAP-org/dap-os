@@ -1,6 +1,6 @@
 # ADR 0009: Release codenames
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR 0011](0011-blackbird-os.md)
 - **Date:** 2026-10-22
 
 ## Context

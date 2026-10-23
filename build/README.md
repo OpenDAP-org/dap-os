@@ -4,7 +4,7 @@ Everything runs locally (no CI).
 
 | Script | What it does |
 |---|---|
-| `dap-image.sh [profile]` | Builds an OpenDAP OS image with mkosi inside the Debian build VM (`lima/opendap-os-build.yaml`, created on first use). Default profile: `qemu`. |
+| `dap-image.sh [profile]` | Builds an Blackbird OS image with mkosi inside the Debian build VM (`lima/blackbird-os-build.yaml`, created on first use). Default profile: `qemu`. |
 | `dap-qemu.sh start\|stop\|ssh\|console` | Runs the **virtual T1** on the host with QEMU (HVF on macOS, KVM on Linux): 4 GB RAM, 32 GB disk, 320 × 480 portrait display, multitouch, the four buttons, audio output. SSH on `127.0.0.1:2222`, remote desktop over VNC on `127.0.0.1:5900`. |
 | `dap-qmp.py screenshot\|press\|tap\|raw` | Headless automation through QEMU's QMP socket: capture the display, press `action` / `vol-up` / `vol-down` / `power`, touch at a pixel. |
 
