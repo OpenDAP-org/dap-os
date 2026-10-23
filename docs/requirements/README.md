@@ -7,7 +7,7 @@ Requirements for the Blackbird OS distribution.
 | OS-001 | Blackbird OS shall run a mainline Linux kernel, version 7 or later. | must | Confirmed |
 | OS-002 | Blackbird OS shall not require custom kernel builds. | must | Confirmed |
 | OS-003 | Blackbird OS shall stay desktop-style, not embedded-style. | must | Confirmed |
-| OS-004 | Blackbird OS shall be a trimmed image, tuned for the T1 SoC and hardware. | must | Confirmed |
+| OS-004 | Each Blackbird OS image shall be trimmed and tuned for its hardware through that hardware's board support package; the OS itself is not tied to one board, and the T1 is the reference. | must | Confirmed |
 | OS-005 | Blackbird OS shall start from executable prebuilt images and packages of its base distribution, modified into a custom image. | must | Confirmed |
 | OS-006 | Blackbird OS shall not require embedded-style builds: no Buildroot or Yocto, and no compiling the kernel or the toolchain. | must | Confirmed |
 | OS-007 | The kernel shall be updatable as a prebuilt package. | must | Draft |
@@ -39,6 +39,7 @@ Requirements for the Blackbird OS distribution.
 
 ## Context
 
+- OS-004 (maintainers, 2026-10-23): reworded so that tuning lives in board support packages, not in the OS (SYS-067, system ADR 0013). The T1 stays the reference board.
 - OS-030, OS-031 (2026-10-23): confirmed under the maintainers' delegation, after they asked Claude to resolve the pending points with the project's design philosophy.
 - OS-032 (maintainers, 2026-10-23): keystore always, TEE when available. Today the RK3566 has no mainline OP-TEE, so the keystore starts on protected filesystem storage ([ADR 0013](../adr/0013-usb-device-mode-and-keystore.md)).
 - OS-030, OS-031 (2026-10-23): proposed by Claude from the [case studies](https://github.com/opendap-project/t1/blob/main/docs/research/ux/2026-10-ecosystem-case-studies.md) (iOS 8.0.1, CrowdStrike 2024, Error 53, Android A/B) and the [conventions spec](https://github.com/opendap-project/system/blob/main/docs/specs/user-facing-conventions.md) §7. Draft until confirmed.
