@@ -1,6 +1,7 @@
 #!/bin/sh
 # Run the virtual T1 (Blackbird OS qemu image) on the host with QEMU, headless.
-# Usage: build/dap-qemu.sh start|stop|ssh [command…]|console   (DAP_IMAGE=<path to a .raw> runs another qemu image)
+# Usage: build/dap-qemu.sh start [--window]|stop|ssh [command…]|console   (DAP_IMAGE=<path to a .raw> runs another qemu image)
+#   --window: also show the display in a native window (macOS), next to VNC on 127.0.0.1:5900
 #   start    boot in the background. Virtual T1 hardware: 4 GB RAM, 32 GB disk, 320x480 portrait display (virtio-gpu),
 #            touch screen (virtio-multitouch), the four buttons (virtio-keyboard), audio out (virtio-sound).
 #            SSH:  127.0.0.1:${DAP_SSH_PORT:-2222}      remote desktop: VNC on 127.0.0.1:${DAP_VNC_DISPLAY:-0} (port 5900+N)
@@ -18,6 +19,10 @@ case "$(uname -s)" in Darwin) accel=hvf; audio=coreaudio;; *) accel=kvm; audio=p
 
 case "${1:-start}" in
   start)
+    display="-display none"
+    if [ "${2:-}" = --window ]; then
+      case "$(uname -s)" in Darwin) display="-display cocoa,zoom-to-fit=on";; *) display="-display gtk,zoom-to-fit=on";; esac
+    fi
     mkdir -p "$run"
     # Fresh 32 GB disk on top of the latest image (the image itself stays untouched).
     if [ ! -f "$disk" ] || [ "$image" -nt "$disk" ] || [ "$(cat "$run/disk.base" 2>/dev/null)" != "$image" ]; then
@@ -33,7 +38,7 @@ case "${1:-start}" in
       -device virtio-gpu-pci \
       -device virtio-multitouch-pci -device virtio-keyboard-pci \
       -audiodev "$audio",id=snd0 -device virtio-sound-pci,audiodev=snd0,streams=1 \
-      -display vnc=127.0.0.1:"$vnc" -qmp unix:"$run/qmp.sock",server=on,wait=off \
+      $display -vnc 127.0.0.1:"$vnc" -qmp unix:"$run/qmp.sock",server=on,wait=off \
       -serial file:"$run/console.log" \
       >"$run/qemu.log" 2>&1 &
     echo $! > "$run/qemu.pid"; sleep 1
@@ -46,5 +51,5 @@ case "${1:-start}" in
     exec ssh -i "$key" -p "$port" -o ConnectTimeout=5 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR root@127.0.0.1 -- "$@";;  # `--`: nothing after the host is read as an ssh option
   console)
     exec tail -f "$run/console.log";;
-  *) echo "usage: $0 start|stop|ssh [command…]|console" >&2; exit 2;;
+  *) echo "usage: $0 start [--window]|stop|ssh [command…]|console" >&2; exit 2;;
 esac
