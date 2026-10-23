@@ -1,0 +1,47 @@
+#!/bin/sh
+# odap-reboot: restart into a boot mode of this device. The device knows its own modes; the opendap
+# CLI (device reboot --mode) and virtual-devices (odap-vdev reboot) call this instead of imitating
+# the button combinations, which stay a way to test the buttons.
+#
+# Usage: odap-reboot [MODE]     restart into MODE (default: normal)
+#        odap-reboot --list     the modes this device has, one per line
+#
+# Modes:
+#   normal    the product boot
+#   debug     the debug boot mode, once (the boot entry's "debug" profile, OS-035), if the image has it
+#   others    from the board support package: an executable /usr/lib/opendap/boot-modes.d/<MODE>
+#             that prepares the next boot into it (recovery, maskrom…); without one, the mode is absent
+#
+# Exit status: 0 the restart is under way, 1 it failed, 2 the mode is unknown on this device.
+set -eu
+modes_dir=/usr/lib/opendap/boot-modes.d
+
+die() { echo "odap-reboot: $1" >&2; exit "${2:-1}"; }
+
+debug_entry() {
+  bootctl list --json=short 2>/dev/null | grep -o '"id":"[^"]*@debug"' | head -n1 | cut -d'"' -f4
+}
+
+list() {
+  echo normal
+  [ -n "$(debug_entry)" ] && echo debug
+  [ -d "$modes_dir" ] && for m in "$modes_dir"/*; do [ -x "$m" ] && basename "$m"; done
+  return 0
+}
+
+mode="${1:-normal}"
+case "$mode" in
+  --list) list ;;
+  -h|--help) sed -n '2,16s/^# \{0,1\}//p' "$0" ;;
+  normal) exec systemctl reboot ;;
+  debug)
+    id="$(debug_entry)"
+    [ -n "$id" ] || die "this image has no debug boot entry; modes: $(list | tr '\n' ' ')" 2
+    bootctl set-oneshot "$id" || die "cannot select the debug boot entry"
+    exec systemctl reboot ;;
+  *)
+    case "$mode" in */*|.*) die "unknown mode $mode" 2 ;; esac
+    [ -x "$modes_dir/$mode" ] || die "no mode $mode on this device; modes: $(list | tr '\n' ' ')" 2
+    "$modes_dir/$mode" || die "cannot prepare the $mode boot"
+    exec systemctl reboot ;;
+esac
