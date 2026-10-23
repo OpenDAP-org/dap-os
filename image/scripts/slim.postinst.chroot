@@ -1,0 +1,26 @@
+#!/bin/sh
+# Apply the image's dpkg path filters (mkosi.sandbox/etc/dpkg/dpkg.cfg.d/01-blackbird-slim) to files
+# that dpkg did not filter: mkosi unpacks the essential packages with dpkg-deb before dpkg and its
+# configuration take part, as mmdebstrap does, so it cleans up after them the same way. One rule
+# set, read from the file dpkg uses; the last matching rule wins, as in dpkg.
+set -eu
+rules="$SRCDIR/mkosi.sandbox/etc/dpkg/dpkg.cfg.d/01-blackbird-slim"
+[ -r "$rules" ] || { echo "slim: $rules not found" >&2; exit 1; }
+
+filtered() {
+  verdict=keep
+  while IFS='=' read -r rule glob; do
+    case "$rule" in path-exclude|path-include) ;; *) continue ;; esac
+    # shellcheck disable=SC2254 # the glob is the rule's own pattern
+    case "$1" in $glob) [ "$rule" = path-exclude ] && verdict=drop || verdict=keep ;; esac
+  done < "$rules"
+  [ "$verdict" = drop ]
+}
+
+roots="$(sed -n 's#^path-exclude=\(/usr/share/[^/*]*\)/.*#\1#p' "$rules" | sort -u)"
+# shellcheck disable=SC2086 # one root per word
+find $roots \( -type f -o -type l \) 2>/dev/null | while read -r f; do
+  if filtered "$f"; then rm -f "$f"; fi
+done
+# shellcheck disable=SC2086
+find $roots -depth -type d -empty -delete 2>/dev/null || true

@@ -1,0 +1,14 @@
+# Blackbird OS installs no documentation, manual pages or translations of system tools (OS-021):
+# the device has no pager for them, and the interface's own languages are OpenDAP's. Copyright
+# files stay, for licence compliance. mkosi's package manager reads it from its sandbox
+# (mkosi.sandbox/) while it builds the image.
+path-exclude=/usr/share/doc/*
+path-include=/usr/share/doc/*/copyright
+path-exclude=/usr/share/man/*
+path-exclude=/usr/share/info/*
+path-exclude=/usr/share/locale/*
+path-include=/usr/share/locale/locale.alias
+path-exclude=/usr/share/lintian/*
+path-exclude=/usr/share/bug/*
+path-exclude=/usr/share/groff/*
+path-exclude=/usr/share/linda/*

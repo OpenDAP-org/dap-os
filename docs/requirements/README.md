@@ -44,7 +44,22 @@ Requirements for the Blackbird OS distribution.
 
 - OS-018, OS-033, OS-034 moved to the [virtual-devices](https://github.com/opendap-project/virtual-devices) repository on 2026-10-23 (VD-001 to VD-003), with the virtual devices themselves.
 - OS-035 (maintainers, 2026-10-23): like any product in production. The debug boot mode is the image's "debug" boot entry (a UKI profile on the virtual board, with consoles and full messages); a product boot is quiet, with no console on the screen or the serial port.
-- Next, once the emulator's initial setup is done (maintainers, 2026-10-23): optimise the packages so the image is as light as possible (OS-021). Measured on 2026-10-23: qemu image 1.5 GB file, 717 MB used, 379 MB compressed with zstd; the generic arm64 kernel's modules (about 240 MB) and LLVM with z3 for Mesa's llvmpipe (about 145 MB) are the largest parts.
+- OS-021, first pass (2026-10-23). The maintainers' rule: leave out only what serves nothing in this project, without over-trimming. What went:
+  - documentation, manual pages and translations of system tools (copyright files stay);
+  - Debian's kernel copies on the ESP, which the unified kernel image already carries;
+  - kernel modules no OpenDAP device, HAT or peripheral can use: datacenter fabrics and adapters, cluster file systems, hypervisor guests, datacenter network cards, PC graphics cards. About 19 MB of 80 MB; every other module stays.
+  - On the virtual board only (its support package): other boards' devicetrees, and an initrd limited to mkosi-initrd's default set plus the board's drivers.
+
+  Measured on the virtual T1:
+
+  | Measure | Before | After |
+  |---|---|---|
+  | Root file system used | 675 MB | 483 MB |
+  | ESP used | 209 MB | 87 MB |
+  | Unified kernel image | 162 MB | 87 MB |
+  | Image compressed with zstd | 379 MB | 241 MB |
+
+  The splash screen now appears 1.97 s after power-on, down from about 3.7 s, because the initrd is smaller. LLVM with z3 (about 145 MB) is the largest part left. It stays until an OpenDAP build of Mesa without LLVM exists (OS-023, see Image size below), because Debian's Mesa needs it, and the virtual board renders with llvmpipe.
 
 - OS-004 (maintainers, 2026-10-23): reworded so that tuning lives in board support packages, not in the OS (SYS-067, system ADR 0013). The T1 stays the reference board.
 - OS-030, OS-031 (2026-10-23): confirmed under the maintainers' delegation, after they asked Claude to resolve the pending points with the project's design philosophy.

@@ -53,12 +53,12 @@ Checked on 2026-10-23 on macOS (Apple silicon) with Lima 2.2.1, mkosi 25.3 in th
    limactl stop blackbird-os-build && limactl edit blackbird-os-build --mount "$PWD:w" --tty=false && limactl start blackbird-os-build
    ```
 
-6. **Build.** The container profile needs nothing else. The qemu profile, for virtual devices, takes two inputs that the build passes in, never your definition: the development key tree (`odap-dev-key tree`) and the virtual board's support package (virtual-devices `export/bsp`):
+6. **Build.** The container profile needs nothing else. The qemu profile, for virtual devices, takes two inputs that the build passes in, never your definition: the development key tree (`odap-dev-key tree`) and the virtual board's support package (virtual-devices `export/bsp`, a mkosi config directory):
 
    ```sh
    limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=oci -f build
    limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=qemu \
-     --extra-tree="$(odap-dev-key tree)" --extra-tree="<virtual-devices>/export/bsp" -f build
+     --extra-tree="$(odap-dev-key tree)" --include="<virtual-devices>/export/bsp" -f build
    ```
 
 7. **Run it on a virtual device.** Point virtual-devices at your image:
