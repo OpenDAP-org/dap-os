@@ -36,5 +36,5 @@
 
 - Hosts without an OpenDAP client get a standard drive on Windows, macOS and Linux. Windows 10 has no inbox NCM driver, which does not affect plain storage.
 - Music on the handed-over volume and not cached cannot play until it is released; the screen says so.
-- A TEE port, or a hardware key holder (a secure element, the RP2350), becomes a platform task for `board` and `blackbird-os`.
+- A hardware key holder is a board requirement (BRD-059, should; a discrete TPM 2.0 is the proposed direction). The keystore uses it when fitted, and an OP-TEE port when one exists.
 - To verify on the bench: driverless enumeration of the composite on Windows 11 and macOS, and the RK3566 DWC3 endpoint count.
