@@ -19,3 +19,14 @@ ln -sf ../usr/lib/os-release /etc/os-release
 
 printf 'Blackbird OS \\n \\l\n\n' > /etc/issue
 printf 'Blackbird OS\n' > /etc/issue.net
+
+# Login message: Debian's says "Debian GNU/Linux"; keep its licence and warranty notice, under our name.
+cat > /etc/motd <<'MOTD'
+
+Blackbird OS is built on Debian GNU/Linux. The programs included with it are
+free software; the exact distribution terms for each program are described in
+the individual files in /usr/share/doc/*/copyright.
+
+Blackbird OS comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+MOTD
