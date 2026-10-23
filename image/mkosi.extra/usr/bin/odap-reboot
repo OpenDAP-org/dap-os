@@ -5,6 +5,8 @@
 #
 # Usage: odap-reboot [MODE]     restart into MODE (default: normal)
 #        odap-reboot --list     the modes this device has, one per line
+#        odap-reboot --serve    one request on standard input, for odap-power.socket: `list`,
+#                               `poweroff` or `reboot MODE`; answers `ok`, the list, or `error: …`
 #
 # Modes:
 #   normal    the product boot
@@ -29,8 +31,27 @@ list() {
   return 0
 }
 
+# The power service (odap-power.socket, for the session's shell): one line in, one answer out,
+# then the action. Only these requests exist; anything else is refused.
+serve() {
+  IFS=' ' read -r verb arg rest || exit 0
+  [ -z "${rest:-}" ] || { echo "error: one argument at most"; exit 2; }
+  case "$verb" in
+    list) list ;;
+    poweroff) echo ok; exec systemctl poweroff ;;
+    reboot)
+      m="${arg:-normal}"
+      case " $(list | tr '\n' ' ') " in
+        *" $m "*) echo ok; exec "$0" "$m" ;;
+        *) echo "error: no mode $m on this device"; exit 2 ;;
+      esac ;;
+    *) echo "error: unknown request"; exit 2 ;;
+  esac
+}
+
 mode="${1:-normal}"
 case "$mode" in
+  --serve) serve ;;
   --list) list ;;
   -h|--help) sed -n '2,16s/^# \{0,1\}//p' "$0" ;;
   normal) exec systemctl reboot ;;

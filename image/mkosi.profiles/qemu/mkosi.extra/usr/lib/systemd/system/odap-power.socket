@@ -1,0 +1,16 @@
+# The power service for the session (system shell and UI runtime spec §7): the shell's power menu
+# asks it to power off or to restart into a boot mode, without root and without polkit. Only the
+# `odap` group (the shell's user) may connect. Interim, until the orchestrator offers
+# org.opendap.system.Power.
+[Unit]
+Description=Blackbird OS power requests
+
+[Socket]
+ListenStream=/run/opendap/power.sock
+SocketUser=root
+SocketGroup=odap
+SocketMode=0660
+Accept=yes
+
+[Install]
+WantedBy=sockets.target
