@@ -2,6 +2,8 @@
 
 Blackbird OS, the operating system of the OpenDAP T1: image build, per-SKU profiles and releases.
 
+To build your own custom ROM based on Blackbird OS, see [docs/derivatives.md](docs/derivatives.md).
+
 ## Layout
 
 - `build/` — build VM (Lima), image build and virtual T1 scripts
