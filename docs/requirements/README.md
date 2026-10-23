@@ -33,13 +33,10 @@ Requirements for the Blackbird OS distribution.
 | OS-027 | Third-party services and certifications (AirPlay, Roon Ready, Spotify, Tidal or Qobuz Connect, an LDAC receiver) are not part of the official image by default; each is evaluated on its own (SYS-035). | must | Confirmed |
 | OS-028 | Blackbird OS shall be derivable: a third party shall be able to build its own distribution based on it, kept apart from it, changing the identity, themes, drivers, packages and configuration without patching the Blackbird OS image definition, the way Blackbird OS is based on Debian. | must | Confirmed |
 
-## Open questions
-
-- OS-028: how derivatives may use the Blackbird OS and OpenDAP names (for example "based on Blackbird OS"), and whether they may use the OpenDAP package repositories or need their own; their release signing keys are their own.
-
 ## Context
 
 - OS-028 (maintainers, 2026-10-23): custom distributions based on Blackbird OS (themes, drivers and so on) are expected if the project grows; the repository has to be ready for them. Guide: [`derivatives.md`](../derivatives.md); decision: [ADR 0012](../adr/0012-derivable-image-definition.md).
+- OS-028 (maintainers, 2026-10-23): derivatives may use the Blackbird OS and OpenDAP names freely; the marks are registered, and their use is permitted. They may use everything OpenDAP publishes (image definition, packages, repositories), change it and add their own. Their release signing keys are their own.
 - OS-023 (maintainers, 2026-10-22): the intent is OpenDAP's own optimised versions of Linux packages, not only stock packages. Debian stays the base (ADR 0002); optimised builds are published as normal packages in the OpenDAP repositories, reproducible and with their sources.
 - Base distribution: Debian trixie with the backports kernel ([ADR 0002](../adr/0002-debian-trixie-with-backports-kernel.md)).
 - Name and versions ([ADR 0011](../adr/0011-blackbird-os.md), superseding ADR 0009 and ADR 0010): the system is Blackbird OS; releases are identified by version number, with no codenames.

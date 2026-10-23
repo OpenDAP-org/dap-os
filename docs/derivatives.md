@@ -43,8 +43,15 @@ mkosi reads an included directory's default-named files (`mkosi.env`, `mkosi.ext
 | Packages and configuration | `Packages=`, `RemovePackages=`, `overlay/`, more `PostInstallationScripts=` |
 | Kernel command line, boot | `KernelCommandLine=` and the other mkosi settings, after `Include=` |
 
+## Names, repositories and keys
+
+Decided by the maintainers on 2026-10-23:
+
+- **Names.** Blackbird OS and OpenDAP are registered marks, and derivatives may use them freely, for example "based on Blackbird OS".
+- **What you may reuse.** Everything OpenDAP publishes: the image definition, the packages and the package repositories. Use it as it is, change it, and add your own.
+- **Signing keys.** Your releases are signed with your own keys (OS-011 covers Blackbird OS's).
+
 ## Not covered yet
 
-- **Name use.** The maintainers have not set a policy on how derivatives may use the Blackbird OS and OpenDAP names (for example, "based on Blackbird OS").
-- **Package repositories and signing keys.** Release signing (OS-011) and the OpenDAP package repositories are not built yet; a derivative will need its own keys and, for its own packages, its own repository.
+- **Package repositories and release signing** are not built yet (OS-011, OS-013); this guide will say how to point a derivative at them when they exist.
 - **Board support.** The `t1` profile is not implemented yet; board support is meant to stay separable (SYS-035).
