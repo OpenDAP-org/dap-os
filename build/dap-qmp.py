@@ -40,12 +40,17 @@ def main(a):
         q.cmd("screendump", filename=os.path.abspath(a[1]), format="png"); print(a[1])
     elif a[0] == "press":
         hold = int(a[2]) if len(a) > 2 else 100
-        key(q, BUTTONS[a[1]], True); time.sleep(hold / 1000); key(q, BUTTONS[a[1]], False)
+        key(q, BUTTONS[a[1]], True); time.sleep(hold / 1000)
+        try:
+            key(q, BUTTONS[a[1]], False)
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # the instance powered off while the button was held (a long press of power)
     elif a[0] == "tap":
         x, y = int(a[1]), int(a[2]); sx, sy = x * 0x7FFF // (WIDTH - 1), y * 0x7FFF // (HEIGHT - 1)
         # virtio-multitouch takes multi-touch ("mtt") events, not pointer "abs" events. Known limit (QEMU 11.1.2):
-        # the position reaches the guest, but begin/end (slot, tracking id) do not, so a full touch contact needs
-        # in-guest injection through uinput; planned with the UI runtime.
+        # the guest receives only BTN_TOUCH, with no position, slot or tracking id (checked 2026-10-23), so this is
+        # not a valid contact. For tests, inject in the guest: `dap-qemu.sh ssh dap-inject tap X Y` (system repo,
+        # deployed in the development system extension).
         mtt = lambda kind, axis="x", value=0: {"type": "mtt", "data": {"type": kind, "slot": 0, "tracking-id": 1, "axis": axis, "value": value}}
         q.cmd("input-send-event", events=[mtt("begin", "x", sx), mtt("data", "x", sx), mtt("data", "y", sy),
                                           {"type": "btn", "data": {"down": True, "button": "touch"}}])

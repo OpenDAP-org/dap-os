@@ -1,0 +1,6 @@
+#!/bin/sh
+# The shell's session starts at boot; development system extensions merge before it.
+set -eu
+systemctl enable dap-shell.service systemd-sysext.service
+systemctl set-default graphical.target
+mkdir -p /var/lib/extensions
