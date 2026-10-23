@@ -1,6 +1,8 @@
 # The boot UI (system shell and UI runtime spec §9): the screen from the moment a display device
 # appears until the shell takes it over, showing the splash screen and nothing else (OS-035).
-# Started by its udev rule when the display device appears; not in the debug boot mode.
+# Started by its udev rule when the display device appears, and again by odap-shell.service when
+# the shell stops, to cover its restart; not in the debug boot mode. Ready (sd_notify) once the
+# splash screen is on the display, so the shell, ordered after it, takes it over from there.
 [Unit]
 Description=Blackbird OS boot UI
 DefaultDependencies=no
@@ -8,8 +10,11 @@ ConditionPathExists=/usr/bin/odap-boot
 ConditionKernelCommandLine=!blackbird.debug
 After=systemd-sysext.service opendap-virtual-device-description.service
 Before=odap-shell.service
+# Never during a shutdown or reboot (DefaultDependencies=no leaves this out).
+Conflicts=shutdown.target
+Before=shutdown.target
 
 [Service]
-Type=exec
+Type=notify
 ExecStart=/usr/bin/odap-boot
 StandardError=journal
