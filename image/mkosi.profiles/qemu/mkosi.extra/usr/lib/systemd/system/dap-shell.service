@@ -6,6 +6,8 @@
 [Unit]
 Description=Blackbird OS shell
 ConditionPathExists=/usr/bin/dap-shell
+# The debug boot mode shows a console on the screen instead (getty@tty1).
+ConditionKernelCommandLine=!blackbird.debug
 After=systemd-user-sessions.service systemd-logind.service systemd-sysext.service
 Conflicts=getty@tty1.service
 After=getty@tty1.service

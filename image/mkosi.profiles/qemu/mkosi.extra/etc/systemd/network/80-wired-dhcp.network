@@ -1,6 +1,8 @@
-# Virtual T1: DHCP on QEMU's user-mode network.
+# Virtual T1: DHCP on every NIC: the management link (QEMU user-mode network) and the LAN
+# (socket_vmnet), with mDNS so hosts on the LAN resolve the instance by name.
 [Match]
 Type=ether
 
 [Network]
 DHCP=yes
+MulticastDNS=yes

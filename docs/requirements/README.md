@@ -21,7 +21,7 @@ Requirements for the Blackbird OS distribution.
 | OS-015 | Development tools that are not for end users (for example OpenOCD) shall come from a separate OpenDAP repository: available and tested on the device, not installed by default. | must | Confirmed |
 | OS-016 | Headless development and automation shall run on QEMU; UI work may use UTM. | must | Confirmed |
 | OS-017 | Recovery: the device shall be recoverable from MaskROM, and A/B updates shall roll back automatically when a new version fails. | must | Draft |
-| OS-018 | The virtual T1 (QEMU) shall mimic the T1 hardware as closely as possible: 320 × 480 portrait display, the four buttons, audio output, battery, and the coprocessor and HAT presence where they can be emulated. | must | Confirmed |
+| OS-018 | The virtual T1 (QEMU) shall mimic the T1 hardware as closely as possible: 320 × 480 portrait display, the four buttons, audio output, battery, and the coprocessor and HAT presence where they can be emulated. | must | Moved (virtual-devices VD-001) |
 | OS-019 | Running instances (virtual or real) shall be controllable remotely: a remote desktop, and headless automation over SSH (screenshots, input injection, scripted UI flows). | must | Confirmed |
 | OS-020 | Playback shall be bit-perfect, including DSD (native and DoP). | must | Confirmed |
 | OS-021 | The default image shall contain only what is mandatory; optional components (for example LLVM) shall be installable from the OpenDAP repositories instead. | must | Confirmed |
@@ -36,8 +36,15 @@ Requirements for the Blackbird OS distribution.
 | OS-030 | Updates shall be deferrable, installed only when idle and charging or on request and never during playback, rolled out in stages, and the previous version shall stay one action away while it is kept; content and data updates (codecs, rules, provider packages) follow the same rules. | must | Confirmed |
 | OS-031 | An update shall never disable a device because a part was replaced or is not original: unknown or third-party parts work as far as they can, with what is missing shown (SYS-040). | must | Confirmed |
 | OS-032 | Every key (device identity, pairing, backups) shall be held through a keystore, never handled as a file by services; the keystore shall be backed by a TEE whenever the platform offers one. | must | Confirmed |
+| OS-033 | The virtual T1 shall work with the `opendap` CLI and OpenDAP Desktop running on the host, as a T1 would. | must | Moved (virtual-devices VD-002) |
+| OS-034 | The virtual T1 shall have network access, to the local network and to the internet. | must | Moved (virtual-devices VD-003) |
+| OS-035 | At boot, on the device and on a virtual device, the screen shall show only the boot image and then the interface the device needs (the normal interface, an update, recovery…); consoles and shells shall appear only in an explicit debug boot mode. | must | Confirmed |
 
 ## Context
+
+- OS-018, OS-033, OS-034 moved to the [virtual-devices](https://github.com/opendap-project/virtual-devices) repository on 2026-10-23 (VD-001 to VD-003), with the virtual devices themselves.
+- OS-035 (maintainers, 2026-10-23): like any product in production. The debug boot mode is the image's "debug" boot entry (a UKI profile on the virtual board, with consoles and full messages); a product boot is quiet, with no console on the screen or the serial port.
+- Next, once the emulator's initial setup is done (maintainers, 2026-10-23): optimise the packages so the image is as light as possible (OS-021). Measured on 2026-10-23: qemu image 1.5 GB file, 717 MB used, 379 MB compressed with zstd; the generic arm64 kernel's modules (about 240 MB) and LLVM with z3 for Mesa's llvmpipe (about 145 MB) are the largest parts.
 
 - OS-004 (maintainers, 2026-10-23): reworded so that tuning lives in board support packages, not in the OS (SYS-067, system ADR 0013). The T1 stays the reference board.
 - OS-030, OS-031 (2026-10-23): confirmed under the maintainers' delegation, after they asked Claude to resolve the pending points with the project's design philosophy.

@@ -1,4 +1,4 @@
-# Build and run
+# Build
 
 Everything runs locally (no CI).
 
@@ -6,15 +6,16 @@ Everything runs locally (no CI).
 |---|---|
 | `dap-image.sh [profile]` | Builds a Blackbird OS image with mkosi inside the Debian build VM (`lima/blackbird-os-build.yaml`, created on first use). Default profile: `qemu`. |
 | `dap-sysroot.sh [--no-build\|--path]` | Builds the `sysroot` profile (the image's packages plus their `-dev` packages) and installs it on the host, in a case-sensitive APFS sparse image under `~/.cache/opendap/`, for cross-builds (`system/scripts/cross.sh`). |
-| `dap-qemu.sh start [--window]\|stop\|ssh\|console` | Runs the **virtual T1** on the host with QEMU (HVF on macOS, KVM on Linux): 4 GB RAM, 32 GB disk, 320 × 480 portrait display, multitouch, the four buttons, audio output. SSH on `127.0.0.1:2222`, remote desktop over VNC on `127.0.0.1:5900`. `--window` also shows the display in a native QEMU window that scales with its size (macOS Screen Sharing refuses QEMU's password-less VNC). |
-| `dap-qmp.py screenshot\|press\|tap\|raw` | Headless automation through QEMU's QMP socket: capture the display, press `action` / `vol-up` / `vol-down` / `power`, touch at a pixel. |
+| `dev-key.sh` | Creates the development SSH key that `qemu` images accept for root (`dev-ssh/`, never in device images). |
+| `security-check.py` | Checks an image's package manifest against known advisories. |
 
-Button mapping in the virtual T1: Action → `KEY_PLAYPAUSE`, Volume + → `KEY_VOLUMEUP`, Volume − → `KEY_VOLUMEDOWN`, Power → `KEY_POWER` (Linux input events). The image's device description (`/usr/share/opendap/device/description.toml`) gives each code its role; a short press of Power goes to the shell, and a long press powers off.
+**Outputs other repositories use:**
 
-The build VM builds images and the sysroot only; software is built on the host and reaches a running instance as a development system extension (`system/scripts/deploy.sh`), without rebuilding the image. Process: [development workflow](https://github.com/opendap-project/toolkit-host/blob/main/docs/specs/development-workflow.md).
+- `image/mkosi.output/blackbird-os-qemu.raw`, the `qemu` image;
+- `build/dev-ssh/id_ed25519`, its development key.
 
-Touch from the host (`dap-qmp.py tap`) is not a valid contact in QEMU 11.1.2. Tests inject touches in the guest with `dap-qemu.sh ssh dap-inject tap X Y`.
+[virtual-devices](https://github.com/opendap-project/virtual-devices) runs that image as any virtual model. Its board support package (`export/bsp/`) is installed into the image by the `qemu` profile.
 
-For UI work with GPU acceleration, the same image can be opened in UTM.
+The build VM builds images and the sysroot only. Software is built on the host and reaches a running instance as a development system extension (`system/scripts/deploy.sh`), without rebuilding the image. Process: [development workflow](https://github.com/opendap-project/toolkit-host/blob/main/docs/specs/development-workflow.md).
 
-Local, never committed: `dev-ssh/` (development SSH key for virtual instances only) and `run/` (QEMU state).
+Local, never committed: `dev-ssh/`.
