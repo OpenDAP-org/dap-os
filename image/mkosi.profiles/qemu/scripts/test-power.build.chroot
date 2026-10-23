@@ -7,7 +7,8 @@ url="https://raw.githubusercontent.com/torvalds/linux/v7.2/drivers/power/supply/
 sha256="df113a2b7c784ed9c6e8a801ce72de5eefe3eb466c733d6ecf923f4fbe6bbc50"
 src=/usr/src/test_power
 mkdir -p "$src"
-curl -fsSL "$url" -o "$src/test_power.c"
+# raw.githubusercontent.com rate-limits now and then (HTTP 429): retry with backoff; the pinned hash still checks the file.
+curl -fsSL --retry 6 --retry-delay 20 --retry-all-errors "$url" -o "$src/test_power.c"
 echo "$sha256  $src/test_power.c" | sha256sum -c -
 echo 'obj-m := test_power.o' > "$src/Kbuild"
 for kver in $(ls /usr/lib/modules); do

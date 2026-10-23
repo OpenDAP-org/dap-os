@@ -131,7 +131,7 @@ GPU drivers in Mesa:
 
 - **Kernel:** generic `linux-postmarketos-stable` 7.2.11, `-mainline` 7.3 and `-lts` 6.18.57 on `main`; v26.06 has 7.0.12. Its aarch64 config enables the full i.MX8MP display stack and Rockchip display, but not `VIDEO_ROCKCHIP_VDEC` and not Rocket.
 - **SoC fit:** RK3566 handhelds and tablets (PineTab2, Anbernic RGxx3) are an active community area (**UNVERIFIED** current device-port status; the GitLab search API needs auth). The mainline-first policy matches our goal exactly. No RK3576 or i.MX8MP device ports were confirmed (**UNVERIFIED**).
-- **Workflow:** `pmbootstrap` installs prebuilt apks into an image. An Blackbird OS device package (`device-opendap-*`) would carry our DTB/overlays, deviceinfo and U-Boot binary. Alternatively, plain Alpine `apk --root … --initdb add` or `alpine-make-rootfs` from prebuilt packages.
+- **Workflow:** `pmbootstrap` installs prebuilt apks into an image. A Blackbird OS device package (`device-opendap-*`) would carry our DTB/overlays, deviceinfo and U-Boot binary. Alternatively, plain Alpine `apk --root … --initdb add` or `alpine-make-rootfs` from prebuilt packages.
 - **UI stack:** Phosh, Plasma Mobile and Sxmo are available, but we would run our own compositor and Slint. systemd has been available as an option in postmarketOS since v24.12. The Alpine base itself uses OpenRC.
 - **musl implications:**
   - Mesa and PipeWire work (Alpine ships both).

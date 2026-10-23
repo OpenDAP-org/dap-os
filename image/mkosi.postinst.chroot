@@ -1,0 +1,21 @@
+#!/bin/sh
+# Blackbird OS identity (ADR 0011): os-release and the console banner.
+# Debian's os-release is diverted, so a base-files upgrade cannot put "Debian" back.
+set -eu
+
+# --no-rename: base-files is Essential, so its file stays in place and is overwritten below; upgrades write to the diversion.
+dpkg-divert --quiet --local --no-rename --divert /usr/lib/os-release.debian --add /usr/lib/os-release
+cat > /usr/lib/os-release <<'OS'
+NAME="Blackbird OS"
+PRETTY_NAME="Blackbird OS (development)"
+ID=blackbird
+ID_LIKE=debian
+VERSION="development"
+HOME_URL="https://github.com/opendap-project/blackbird-os"
+SUPPORT_URL="https://github.com/opendap-project/blackbird-os"
+BUG_REPORT_URL="https://github.com/opendap-project/blackbird-os/issues"
+OS
+ln -sf ../usr/lib/os-release /etc/os-release
+
+printf 'Blackbird OS \\n \\l\n\n' > /etc/issue
+printf 'Blackbird OS\n' > /etc/issue.net

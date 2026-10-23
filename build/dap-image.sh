@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build an Blackbird OS image inside the Debian build VM.
+# Build a Blackbird OS image inside the Debian build VM.
 # Usage: build/dap-image.sh [profile]   (default: qemu)
 set -eu
 profile="${1:-qemu}"
