@@ -1,6 +1,6 @@
 # Blackbird OS
 
-Blackbird OS, the operating system of the OpenDAP T1: image build, per-SKU profiles and releases.
+Blackbird OS, the operating system of OpenDAP devices: the image definition, its profiles and releases. The T1 is its first device; a device's specifics come from its board support package, never from this definition.
 
 Part of [OpenDAP](https://github.com/opendap-project). This repository is open source.
 

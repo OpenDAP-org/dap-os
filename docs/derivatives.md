@@ -1,6 +1,6 @@
 # Building a custom ROM based on Blackbird OS
 
-A custom ROM here is a distribution based on Blackbird OS: your own system for the T1 (or the virtual T1), with your name, theme, drivers, packages and configuration, built on top of Blackbird OS instead of a fork of it.
+A custom ROM here is a distribution based on Blackbird OS: your own system for OpenDAP hardware such as the T1 (or a virtual device), with your name, theme, drivers, packages and configuration, built on top of Blackbird OS instead of a fork of it.
 
 Blackbird OS is built on Debian and changes it apart, in its own repository: its own identity, packages, configuration and drivers on top of Debian's. A distribution based on Blackbird OS works the same way. It keeps Blackbird OS's image definition unchanged and adds what makes it different (a theme, drivers, configuration, other packages), so it can follow Blackbird OS releases without carrying a patched copy.
 
@@ -47,31 +47,28 @@ Checked on 2026-10-23 on macOS (Apple silicon) with Lima 2.2.1, mkosi 25.3 in th
 
    Then set your identity in `identity.env` (`OS_NAME`, `OS_PRETTY_NAME`, `OS_ID`, …), your `ImageId` and `Hostname` in `mkosi.conf`, and your output names in `mkosi.profiles/<profile>/mkosi.conf`.
 4. **Add what makes it yours:** files in `overlay/`, packages with `Packages=`, drivers as DKMS packages, a theme (see the table below).
-5. **The build VM.** Blackbird OS builds inside a Debian VM (`blackbird-os/build/lima/blackbird-os-build.yaml`). Create it with your repository mounted, or add the mount to an existing one:
+5. **The build VM.** Images build inside a Debian VM, from toolkit-image (`odap-image vm start`). Mount your repository into it, or add the mount to an existing one:
 
    ```sh
-   limactl start --name=blackbird-os-build --mount "$PWD:w" --tty=false blackbird-os/build/lima/blackbird-os-build.yaml
-   # or, on an existing VM: limactl stop blackbird-os-build && limactl edit blackbird-os-build --mount "$PWD:w" --tty=false
+   limactl stop blackbird-os-build && limactl edit blackbird-os-build --mount "$PWD:w" --tty=false && limactl start blackbird-os-build
    ```
 
-6. **Build.** The container profile needs nothing else; the qemu profile (the virtual T1) needs the development SSH key first:
+6. **Build.** The container profile needs nothing else. The qemu profile, for virtual devices, takes two inputs that the build passes in, never your definition: the development key tree (`odap-dev-key tree`) and the virtual board's support package (virtual-devices `export/bsp`):
 
    ```sh
    limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=oci -f build
-   blackbird-os/build/dev-key.sh
-   limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=qemu -f build
+   limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=qemu \
+     --extra-tree="$(odap-dev-key tree)" --extra-tree="<virtual-devices>/export/bsp" -f build
    ```
 
-7. **Run it on the virtual T1.** Point the CLI at your submodule and your image:
+7. **Run it on a virtual device.** Point virtual-devices at your image:
 
    ```sh
-   export BLACKBIRD_OS_DIR="$PWD/blackbird-os" DAP_IMAGE="$PWD/mkosi.output/<your-image>-qemu.raw"
-   opendap vm start
-   opendap exec -- cat /etc/os-release
-   opendap vm stop
+   ODAP_IMAGE="$PWD/mkosi.output/<your-image>-qemu.raw" odap-vdev start --wait
+   odap-vdev ssh cat /etc/os-release
+   odap-vdev stop
    ```
 
-   Keep the repository at a short path: QEMU's control socket lives under `blackbird-os/build/run/`, and macOS limits socket paths to 104 bytes.
 8. **Follow Blackbird OS.** Move the submodule to a new release, rebuild, and test. Your changes stay in your files, so there is nothing to rebase.
 
 Flashing a real T1 and signed releases come with the `t1` profile and OS-011, which are not built yet.

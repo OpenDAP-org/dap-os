@@ -1,13 +1,12 @@
 # Blackbird OS
 
-Blackbird OS, the operating system of the OpenDAP T1: image build, per-SKU profiles and releases.
+Blackbird OS, the operating system of OpenDAP devices: the image definition, its profiles and releases. The T1 is its first device; a device's specifics come from its board support package, never from this definition.
 
 To build your own custom ROM based on Blackbird OS, see [docs/derivatives.md](docs/derivatives.md).
 
 ## Layout
 
-- `build/` — build VM (Lima), image build and virtual T1 scripts
-- `image/`
+- `image/` — the image definition (built with toolkit-image `odap-image`; outputs in `image/mkosi.output/`)
 - `examples/` — `derivative/`, a minimal distribution based on Blackbird OS ([guide](docs/derivatives.md))
 - `docs/`
 

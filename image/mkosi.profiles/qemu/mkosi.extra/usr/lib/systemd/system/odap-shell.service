@@ -1,20 +1,20 @@
-# The Blackbird OS session (system ADR 0002): dap-shell on the first virtual terminal, as the `dap`
+# The Blackbird OS session (system ADR 0002): odap-shell on the first virtual terminal, as the `odap`
 # user, in a logind session opened through PAM, so libseat gets the display and input devices
 # from logind. Until the orchestrator starts activities, the shell starts the product host.
 # The binaries come from Blackbird OS packages, or from a development system extension
 # (/var/lib/extensions) during development.
 [Unit]
 Description=Blackbird OS shell
-ConditionPathExists=/usr/bin/dap-shell
+ConditionPathExists=/usr/bin/odap-shell
 # The debug boot mode shows a console on the screen instead (getty@tty1).
 ConditionKernelCommandLine=!blackbird.debug
-After=systemd-user-sessions.service systemd-logind.service systemd-sysext.service
-Conflicts=getty@tty1.service
-After=getty@tty1.service
+After=systemd-user-sessions.service systemd-logind.service systemd-sysext.service odap-boot.service
+# No Conflicts= with getty@tty1: systemd applies a conflict before conditions, so it would stop
+# the debug boot's console. The two exclude each other by condition (blackbird.debug).
 
 [Service]
-User=dap
-PAMName=dap-shell
+User=odap
+PAMName=odap-shell
 TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
@@ -25,7 +25,10 @@ StandardError=journal
 UtmpIdentifier=tty1
 UtmpMode=user
 Environment=XDG_SESSION_TYPE=wayland XDG_SESSION_CLASS=user
-ExecStart=/usr/bin/dap-shell -- /usr/bin/dap-product
+ExecStart=/usr/bin/odap-shell -- /usr/bin/odap-product
+# The boot UI hands the display over and confirms before the shell starts (odap-boot handoff);
+# without a boot UI it returns at once. Privileged ('+'), and not fatal ('-') without odap-boot.
+ExecStartPre=-+/usr/bin/odap-boot handoff
 Restart=always
 RestartSec=1
 

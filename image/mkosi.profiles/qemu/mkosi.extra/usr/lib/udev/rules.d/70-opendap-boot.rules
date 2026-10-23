@@ -1,0 +1,2 @@
+# The boot UI (odap-boot) takes the screen as soon as a display device appears (OS-035).
+SUBSYSTEM=="drm", KERNEL=="card[0-9]*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="odap-boot.service"

@@ -5,8 +5,6 @@
 image/mkosi.output/
 image/mkosi.cache/
 image/mkosi.builddir/
-build/dev-ssh/
-build/run/
 examples/*/mkosi.output/
 examples/*/mkosi.cache/
 examples/*/mkosi.builddir/

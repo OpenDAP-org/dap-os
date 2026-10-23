@@ -11,4 +11,4 @@ OpenDAP OS images are versioned and published as releases (OS-011). OpenDAP OS i
 
 Each OpenDAP OS release carries a public codename, as Debian's do. The first release is **Blackbird**: "OpenDAP Blackbird".
 
-The codename appears in the release notes, as `VERSION_CODENAME` in `/etc/os-release`, and in the release's package repository suites. Its brand assets (release lockups and banner) are in [blackbird-ui](https://github.com/opendap-project/blackbird-ui/tree/main/brand/releases/blackbird).
+The codename appears in the release notes, as `VERSION_CODENAME` in `/etc/os-release`, and in the release's package repository suites. Its brand assets (release lockups and banner) are in [blackbird-ui](https://github.com/opendap-project/blackbird-ui/tree/main/brand) (release lockups were never made: ADR 0011 dropped codenames).
