@@ -6,7 +6,7 @@ Blackbird OS, the operating system of the OpenDAP T1: image build, per-SKU profi
 
 - `build/` — build VM (Lima), image build and virtual T1 scripts
 - `image/`
-- `overlays/`
+- `examples/` — `derivative/`, a minimal distribution based on Blackbird OS ([guide](docs/derivatives.md))
 - `docs/`
 
 ## License

@@ -1,0 +1,50 @@
+# Building a distribution based on Blackbird OS
+
+Blackbird OS is built on Debian and changes it apart, in its own repository: its own identity, packages, configuration and drivers on top of Debian's. A distribution based on Blackbird OS works the same way. It keeps Blackbird OS's image definition unchanged and adds what makes it different (a theme, drivers, configuration, other packages), so it can follow Blackbird OS releases without carrying a patched copy.
+
+Derivatives are the community's scope: OpenDAP documents how to build one and keeps the image definition derivable, but does not support them (SYS-035). Requirement: OS-028. Decision: [ADR 0012](adr/0012-derivable-image-definition.md).
+
+## A minimal derivative
+
+[`examples/derivative/`](../examples/derivative/) is a working example, built and checked on 2026-10-23 with mkosi 25.3:
+
+```text
+examples/derivative/
+├── mkosi.conf              includes ../../image, then sets ImageId, Hostname and its own output and cache directories
+├── identity.env            the OS_* identity variables (name, ID, ID_LIKE, version, URLs)
+├── overlay/                files copied on top of Blackbird OS's trees
+└── mkosi.profiles/<p>/     the output name for each Blackbird OS profile (qemu, oci)
+```
+
+Build it from the Blackbird OS build VM, like Blackbird OS itself:
+
+```sh
+limactl shell blackbird-os-build -- sudo mkosi -C "$PWD/examples/derivative" --profile=oci -f build
+```
+
+Its `/usr/lib/os-release` then reads `NAME="Example OS"`, `ID=example`, `ID_LIKE="blackbird debian"`, with its own hostname, banner and login message. In your own repository, point `Include=` at a Blackbird OS checkout (for example a git submodule pinned to a release).
+
+## Rules that keep a derivative working
+
+mkosi reads an included directory's default-named files (`mkosi.env`, `mkosi.extra/`) before the including directory's settings that follow `Include=`, and later values win. So:
+
+- **Identity:** put the `OS_*` variables in a file with another name (`identity.env`) and list it in `EnvironmentFiles=` after `Include=`. A file named `mkosi.env` is read before Blackbird OS's and loses.
+- **Files:** put your tree in a directory with another name (`overlay/`) and list it in `ExtraTrees=` after `Include=`, so your files replace Blackbird OS's. A tree named `mkosi.extra/` is copied first and loses.
+- **Outputs:** set your own `ImageId`, `OutputDirectory`, `CacheDirectory` and, per profile, `Output`, so a build never overwrites Blackbird OS's images.
+- **`ID_LIKE`:** list `blackbird` before `debian`, so tools that know Blackbird OS treat your system as a relative.
+
+## What a derivative changes
+
+| Change | How |
+|---|---|
+| Name, version, URLs | `identity.env` (`OS_NAME`, `OS_PRETTY_NAME`, `OS_ID`, `OS_ID_LIKE`, `OS_VERSION`, `OS_HOME_URL`, `OS_SUPPORT_URL`, `OS_BUG_REPORT_URL`, and `OS_BASED_ON` for the login message) |
+| Theme | A token set and templates, installed as files or a package (SYS-030; the theme format is not defined yet) |
+| Drivers | DKMS packages (ADR 0007) or vendor drivers (ADR 0008), added with `Packages=` |
+| Packages and configuration | `Packages=`, `RemovePackages=`, `overlay/`, more `PostInstallationScripts=` |
+| Kernel command line, boot | `KernelCommandLine=` and the other mkosi settings, after `Include=` |
+
+## Not covered yet
+
+- **Name use.** The maintainers have not set a policy on how derivatives may use the Blackbird OS and OpenDAP names (for example, "based on Blackbird OS").
+- **Package repositories and signing keys.** Release signing (OS-011) and the OpenDAP package repositories are not built yet; a derivative will need its own keys and, for its own packages, its own repository.
+- **Board support.** The `t1` profile is not implemented yet; board support is meant to stay separable (SYS-035).

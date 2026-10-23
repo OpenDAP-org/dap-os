@@ -4,6 +4,7 @@
 |---|---|
 | [`requirements/`](requirements/) | What this project must achieve. Each requirement has an ID, a priority (**must** / **should**) and a status. |
 | [`adr/`](adr/) | Architecture Decision Records: decisions already taken, with their context. A decision can be superseded by a later ADR. |
+| [`derivatives.md`](derivatives.md) | How to build a distribution based on Blackbird OS (OS-028). |
 
 Only information confirmed by the maintainers is recorded here. Earlier experiments are not a source.
 

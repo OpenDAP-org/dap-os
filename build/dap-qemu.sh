@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run the virtual T1 (Blackbird OS qemu image) on the host with QEMU, headless.
-# Usage: build/dap-qemu.sh start|stop|ssh [command…]|console
+# Usage: build/dap-qemu.sh start|stop|ssh [command…]|console   (DAP_IMAGE=<path to a .raw> runs another qemu image)
 #   start    boot in the background. Virtual T1 hardware: 4 GB RAM, 32 GB disk, 320x480 portrait display (virtio-gpu),
 #            touch screen (virtio-multitouch), the four buttons (virtio-keyboard), audio out (virtio-sound).
 #            SSH:  127.0.0.1:${DAP_SSH_PORT:-2222}      remote desktop: VNC on 127.0.0.1:${DAP_VNC_DISPLAY:-0} (port 5900+N)
@@ -10,7 +10,7 @@ set -eu
 here="$(cd "$(dirname "$0")" && pwd)"
 repo="$(cd "$here/.." && pwd)"
 run="$here/run"; port="${DAP_SSH_PORT:-2222}"; vnc="${DAP_VNC_DISPLAY:-0}"
-image="$repo/image/mkosi.output/blackbird-os-qemu.raw"
+image="${DAP_IMAGE:-$repo/image/mkosi.output/blackbird-os-qemu.raw}"   # DAP_IMAGE: another qemu image, e.g. a derivative's
 disk="$run/disk.qcow2"   # 32 GB like the T1, backed by the built image
 key="$here/dev-ssh/id_ed25519"
 fw_code="$(brew --prefix qemu 2>/dev/null)/share/qemu/edk2-aarch64-code.fd"
@@ -20,8 +20,8 @@ case "${1:-start}" in
   start)
     mkdir -p "$run"
     # Fresh 32 GB disk on top of the latest image (the image itself stays untouched).
-    if [ ! -f "$disk" ] || [ "$image" -nt "$disk" ]; then
-      rm -f "$disk"; qemu-img create -q -f qcow2 -F raw -b "$image" "$disk" 32G
+    if [ ! -f "$disk" ] || [ "$image" -nt "$disk" ] || [ "$(cat "$run/disk.base" 2>/dev/null)" != "$image" ]; then
+      rm -f "$disk"; qemu-img create -q -f qcow2 -F raw -b "$image" "$disk" 32G; echo "$image" > "$run/disk.base"
     fi
     [ -f "$run/vars.fd" ] || dd if=/dev/zero of="$run/vars.fd" bs=1m count=64 2>/dev/null
     # Not -daemonize: on macOS it forks after CoreAudio initializes and crashes.

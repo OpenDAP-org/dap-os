@@ -1,32 +1,31 @@
 #!/bin/sh
-# Blackbird OS identity (ADR 0011): os-release and the console banner.
-# Debian's os-release is diverted, so a base-files upgrade cannot put "Debian" back.
+# System identity (ADR 0011): os-release, console banners and the login message, from the OS_* variables
+# in mkosi.env. A derivative distribution sets its own values in its own mkosi.env, which mkosi reads after
+# this one (docs/derivatives.md). Debian's os-release is diverted, so a base-files upgrade cannot put it back.
 set -eu
+: "${OS_NAME:?}" "${OS_PRETTY_NAME:?}" "${OS_ID:?}" "${OS_ID_LIKE:?}" "${OS_VERSION:?}" "${OS_BASED_ON:?}"
 
 # --no-rename: base-files is Essential, so its file stays in place and is overwritten below; upgrades write to the diversion.
 dpkg-divert --quiet --local --no-rename --divert /usr/lib/os-release.debian --add /usr/lib/os-release
-cat > /usr/lib/os-release <<'OS'
-NAME="Blackbird OS"
-PRETTY_NAME="Blackbird OS (development)"
-ID=blackbird
-ID_LIKE=debian
-VERSION="development"
-HOME_URL="https://github.com/opendap-project/blackbird-os"
-SUPPORT_URL="https://github.com/opendap-project/blackbird-os"
-BUG_REPORT_URL="https://github.com/opendap-project/blackbird-os/issues"
-OS
+{
+  echo "NAME=\"$OS_NAME\""
+  echo "PRETTY_NAME=\"$OS_PRETTY_NAME\""
+  echo "ID=$OS_ID"
+  echo "ID_LIKE=\"$OS_ID_LIKE\""
+  echo "VERSION=\"$OS_VERSION\""
+  [ -n "${OS_HOME_URL:-}" ] && echo "HOME_URL=\"$OS_HOME_URL\""
+  [ -n "${OS_SUPPORT_URL:-}" ] && echo "SUPPORT_URL=\"$OS_SUPPORT_URL\""
+  [ -n "${OS_BUG_REPORT_URL:-}" ] && echo "BUG_REPORT_URL=\"$OS_BUG_REPORT_URL\""
+} > /usr/lib/os-release
 ln -sf ../usr/lib/os-release /etc/os-release
 
-printf 'Blackbird OS \\n \\l\n\n' > /etc/issue
-printf 'Blackbird OS\n' > /etc/issue.net
+printf '%s \\n \\l\n\n' "$OS_NAME" > /etc/issue
+printf '%s\n' "$OS_NAME" > /etc/issue.net
 
-# Login message: Debian's says "Debian GNU/Linux"; keep its licence and warranty notice, under our name.
-cat > /etc/motd <<'MOTD'
-
-Blackbird OS is built on Debian GNU/Linux. The programs included with it are
-free software; the exact distribution terms for each program are described in
-the individual files in /usr/share/doc/*/copyright.
-
-Blackbird OS comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
-applicable law.
-MOTD
+# Login message: Debian's says "Debian GNU/Linux"; keep its licence and warranty notice, under the system's name.
+{
+  echo
+  echo "$OS_NAME is built on $OS_BASED_ON. The programs included with it are free software; the exact distribution terms for each program are described in the individual files in /usr/share/doc/*/copyright." | fold -s -w 76
+  echo
+  echo "$OS_NAME comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law." | fold -s -w 76
+} | sed 's/ *$//' > /etc/motd
