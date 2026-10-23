@@ -29,11 +29,12 @@ ExecStart=/usr/bin/odap-shell -- /usr/bin/odap-product
 # The boot UI hands the display over and confirms before the shell starts (odap-boot handoff);
 # without a boot UI it returns at once. Privileged ('+'), and not fatal ('-') without odap-boot.
 ExecStartPre=-+/usr/bin/odap-boot handoff
-# When the shell stops (a crash, an update), the boot UI takes the display back until the next
-# shell is up, instead of the kernel's console. It starts once the shell has stopped (systemd
-# orders a stop before a start), so about 0.1 s of black remains between the two.
-# Not while the system shuts down, when systemd would refuse it anyway.
-ExecStopPost=-+/bin/sh -c '[ "$(systemctl is-system-running)" = stopping ] || exec systemctl start --no-block odap-boot.service'
+# When the shell stops (an update, a crash), the boot UI takes the display until the next shell
+# is up, instead of the kernel's console (odap-boot cover; not while the system shuts down).
+# Before the shell is asked to stop, the boot UI is armed; the shell then hands the display over
+# on SIGTERM with no blank frame. After a crash, the boot UI takes the display the shell left.
+ExecStop=-+/usr/bin/odap-boot cover
+ExecStopPost=-+/usr/bin/odap-boot cover
 Restart=always
 RestartSec=1
 
