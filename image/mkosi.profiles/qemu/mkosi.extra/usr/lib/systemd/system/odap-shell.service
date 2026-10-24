@@ -25,7 +25,10 @@ StandardError=journal
 UtmpIdentifier=tty1
 UtmpMode=user
 Environment=XDG_SESSION_TYPE=wayland XDG_SESSION_CLASS=user
-ExecStart=/usr/bin/odap-shell -- /usr/bin/odap-product
+# For now the shell runs the testbed (system odap-testbed): a blueprint test screen of the shell's
+# regions and the UI primitives, in place of the product's places. A drop-in that sets
+# ExecStart= to `/usr/bin/odap-shell -- /usr/bin/odap-product` runs the product host instead.
+ExecStart=/usr/bin/odap-shell -- /usr/bin/odap-testbed
 # The boot UI hands the display over and confirms before the shell starts (odap-boot handoff);
 # without a boot UI it returns at once. Privileged ('+'), and not fatal ('-') without odap-boot.
 ExecStartPre=-+/usr/bin/odap-boot handoff
