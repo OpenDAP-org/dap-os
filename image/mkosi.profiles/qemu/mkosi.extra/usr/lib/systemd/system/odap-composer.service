@@ -1,11 +1,11 @@
-# The Blackbird OS session (system ADR 0002): odap-shell on the first virtual terminal, as the `odap`
+# The Blackbird OS session (system ADR 0002): odap-composer on the first virtual terminal, as the `odap`
 # user, in a logind session opened through PAM, so libseat gets the display and input devices
-# from logind. Until the orchestrator starts activities, the shell starts the product host.
+# from logind. Until the orchestrator starts activities, the composer starts the product host.
 # The binaries come from Blackbird OS packages, or from a development system extension
 # (/var/lib/extensions) during development.
 [Unit]
-Description=Blackbird OS shell
-ConditionPathExists=/usr/bin/odap-shell
+Description=Blackbird OS composer
+ConditionPathExists=/usr/bin/odap-composer
 # The debug boot mode shows a console on the screen instead (getty@tty1).
 ConditionKernelCommandLine=!blackbird.debug
 After=systemd-user-sessions.service systemd-logind.service systemd-sysext.service odap-boot.service
@@ -14,9 +14,9 @@ After=systemd-user-sessions.service systemd-logind.service systemd-sysext.servic
 
 [Service]
 User=odap
-# What the shell says to other services (ui-ready: its first frame is on screen).
-RuntimeDirectory=opendap/shell
-PAMName=odap-shell
+# What the composer says to other services (ui-ready: its first frame is on screen).
+RuntimeDirectory=opendap/composer
+PAMName=odap-composer
 TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
@@ -27,18 +27,18 @@ StandardError=journal
 UtmpIdentifier=tty1
 UtmpMode=user
 Environment=XDG_SESSION_TYPE=wayland XDG_SESSION_CLASS=user
-# The shell runs the product host. The activity flag starts a developer activity in its place
+# The composer runs the product host. The activity flag starts a developer activity in its place
 # (system SYS-071): ODAP_ACTIVITY=ui-primitives in a drop-in, or the name in /run/opendap/activity
 # on a running device, then a restart of this unit. The debug UI mode (SYS-070) is its own flag:
 # ODAP_DEBUG_UI=1, or /run/opendap/debug-ui.
-ExecStart=/usr/bin/odap-shell -- /usr/bin/odap-product
-# The boot UI hands the display over and confirms before the shell starts (odap-boot handoff);
+ExecStart=/usr/bin/odap-composer -- /usr/bin/odap-product
+# The boot UI hands the display over and confirms before the composer starts (odap-boot handoff);
 # without a boot UI it returns at once. Privileged ('+'), and not fatal ('-') without odap-boot.
 ExecStartPre=-+/usr/bin/odap-boot handoff
-# When the shell stops (an update, a crash), the boot UI takes the display until the next shell
+# When the composer stops (an update, a crash), the boot UI takes the display until the next composer
 # is up, instead of the kernel's console (odap-boot cover; not while the system shuts down).
-# Before the shell is asked to stop, the boot UI is armed; the shell then hands the display over
-# on SIGTERM with no blank frame. After a crash, the boot UI takes the display the shell left.
+# Before the composer is asked to stop, the boot UI is armed; the composer then hands the display over
+# on SIGTERM with no blank frame. After a crash, the boot UI takes the display the composer left.
 ExecStop=-+/usr/bin/odap-boot cover
 ExecStopPost=-+/usr/bin/odap-boot cover
 Restart=always

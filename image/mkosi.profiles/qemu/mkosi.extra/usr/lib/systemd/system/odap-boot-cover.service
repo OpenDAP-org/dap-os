@@ -1,9 +1,9 @@
-# The boot UI covering a restart of the shell (system shell and UI runtime spec §9). Started by
-# `odap-boot cover` from odap-shell.service when the shell stops. Unlike odap-boot.service it has
-# no ordering with the shell, so it starts while the shell is still stopping (systemd orders a stop
-# before a start between ordered units) and takes the display the moment the shell lets it go.
+# The boot UI covering a restart of the composer (system composer and UI runtime spec §9). Started by
+# `odap-boot cover` from odap-composer.service when the composer stops. Unlike odap-boot.service it has
+# no ordering with the composer, so it starts while the composer is still stopping (systemd orders a stop
+# before a start between ordered units) and takes the display the moment the composer lets it go.
 [Unit]
-Description=Blackbird OS boot UI, covering the shell
+Description=Blackbird OS boot UI, covering the composer
 DefaultDependencies=no
 ConditionPathExists=/usr/bin/odap-boot
 ConditionKernelCommandLine=!blackbird.debug

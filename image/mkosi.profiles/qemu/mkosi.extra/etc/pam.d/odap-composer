@@ -1,4 +1,4 @@
-# The session of the Blackbird OS shell: no password (the device has one user session), a logind
+# The session of the Blackbird OS composer: no password (the device has one user session), a logind
 # session for the seat.
 auth     required pam_permit.so
 account  required pam_permit.so

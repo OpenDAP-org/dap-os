@@ -31,7 +31,7 @@ list() {
   return 0
 }
 
-# The power service (odap-power.socket, for the session's shell): one line in, one answer out,
+# The power service (odap-power.socket, for the session's composer): one line in, one answer out,
 # then the action. Only these requests exist; anything else is refused.
 serve() {
   IFS=' ' read -r verb arg rest || exit 0

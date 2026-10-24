@@ -7,7 +7,7 @@ The Blackbird OS image definition, built with [mkosi](https://github.com/systemd
   - kernel modules for hardware no OpenDAP device, HAT or peripheral can have (datacenter fabrics and adapters, cluster file systems, hypervisor guests, PC graphics cards). Every other module stays; a board support package trims further only what its board cannot use, such as other boards' devicetrees.
 - `mkosi.profiles/<profile>/`: per-output settings. `qemu` (virtual T1), `oci` (container) and `sysroot` (headers and libraries for cross-builds on the host, never shipped) are implemented; `t1` (device) is not yet.
 - The `qemu` profile is the image for every virtual device ([virtual-devices](https://github.com/opendap-project/virtual-devices)). It carries no model: the build includes the virtual board's support package (virtual-devices `export/bsp`: files, initrd drivers, kernel options), which reads the running model's description from the virtual board. It also carries:
-  - the shell's session: `odap-shell.service`, run as the `odap` user through PAM and logind;
+  - the composer's session: `odap-composer.service`, run as the `odap` user through PAM and logind;
   - the display stack;
   - `systemd-sysext`, for development extensions;
   - the power-key policy;

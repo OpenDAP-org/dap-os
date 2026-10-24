@@ -1,6 +1,6 @@
-# The power service for the session (system shell and UI runtime spec §7): the shell's power menu
+# The power service for the session (system composer and UI runtime spec §7): the OS Shell's power menu (a draft in the composer, RFC 0012)
 # asks it to power off or to restart into a boot mode, without root and without polkit. Only the
-# `odap` group (the shell's user) may connect. Interim, until the orchestrator offers
+# `odap` group (the composer's user) may connect. Interim, until the orchestrator offers
 # org.opendap.system.Power.
 [Unit]
 Description=Blackbird OS power requests
