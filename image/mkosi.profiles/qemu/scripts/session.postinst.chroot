@@ -1,7 +1,7 @@
 #!/bin/sh
 # The shell's session starts at boot; development system extensions merge before it.
 set -eu
-systemctl enable odap-shell.service odap-power.socket systemd-sysext.service opendap-virtual-device-description.service
+systemctl enable odap-shell.service odap-power.socket systemd-sysext.service opendap-virtual-device-description.service odap-statusled.service
 systemctl set-default graphical.target
 # The boot loader is updated with the system (OS-030), not on every boot: this unit delayed
 # sysinit by about 1 s each time.
