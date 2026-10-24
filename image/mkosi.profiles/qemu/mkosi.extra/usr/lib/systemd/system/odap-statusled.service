@@ -1,0 +1,21 @@
+# The status LED (system odap-statusled; T1 controls spec §2): the device's highest-priority
+# state on the faceplate's LED, from the first moments of boot.
+[Unit]
+Description=Status LED
+DefaultDependencies=no
+After=systemd-modules-load.service systemd-udev-settle.service
+Before=odap-shell.service
+ConditionPathExists=/usr/bin/odap-statusled
+
+[Service]
+ExecStart=/usr/bin/odap-statusled
+Restart=on-failure
+RestartSec=2
+ProtectSystem=strict
+ReadWritePaths=/sys/class/leds /sys/devices /run/opendap
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target
