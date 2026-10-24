@@ -3,7 +3,7 @@
 [Unit]
 Description=Status LED
 DefaultDependencies=no
-After=systemd-modules-load.service systemd-udev-settle.service
+After=systemd-modules-load.service systemd-sysext.service systemd-udev-settle.service
 Before=odap-shell.service
 ConditionPathExists=/usr/bin/odap-statusled
 # It waits for its LED itself; a missing one is never a reason to stop retrying.

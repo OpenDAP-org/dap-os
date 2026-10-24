@@ -14,6 +14,8 @@ After=systemd-user-sessions.service systemd-logind.service systemd-sysext.servic
 
 [Service]
 User=odap
+# What the shell says to other services (ui-ready: its first frame is on screen).
+RuntimeDirectory=opendap/shell
 PAMName=odap-shell
 TTYPath=/dev/tty1
 TTYReset=yes
