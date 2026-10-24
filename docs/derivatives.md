@@ -47,18 +47,18 @@ Checked on 2026-10-23 on macOS (Apple silicon) with Lima 2.2.1, mkosi 25.3 in th
 
    Then set your identity in `identity.env` (`OS_NAME`, `OS_PRETTY_NAME`, `OS_ID`, …), your `ImageId` and `Hostname` in `mkosi.conf`, and your output names in `mkosi.profiles/<profile>/mkosi.conf`.
 4. **Add what makes it yours:** files in `overlay/`, packages with `Packages=`, drivers as DKMS packages, a theme (see the table below).
-5. **The build VM.** Images build inside a Debian VM, from toolkit-image (`odap-image vm start`). Mount your repository into it, or add the mount to an existing one:
+5. **The build VM.** Images build inside a Debian VM, from toolkit-image (`odapkit image vm start`). Mount your repository into it, or add the mount to an existing one:
 
    ```sh
    limactl stop blackbird-os-build && limactl edit blackbird-os-build --mount "$PWD:w" --tty=false && limactl start blackbird-os-build
    ```
 
-6. **Build.** The container profile needs nothing else. The qemu profile, for virtual devices, takes two inputs that the build passes in, never your definition: the development key tree (`odap-dev-key tree`) and the virtual board's support package (virtual-devices `export/bsp`, a mkosi config directory):
+6. **Build.** The container profile needs nothing else. The qemu profile, for virtual devices, takes two inputs that the build passes in, never your definition: the development key tree (`odapkit dev-key tree`) and the virtual board's support package (virtual-devices `export/bsp`, a mkosi config directory):
 
    ```sh
    limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=oci -f build
    limactl shell blackbird-os-build -- sudo mkosi -C "$PWD" --profile=qemu \
-     --extra-tree="$(odap-dev-key tree)" --include="<virtual-devices>/export/bsp" -f build
+     --extra-tree="$(odapkit dev-key tree)" --include="<virtual-devices>/export/bsp" -f build
    ```
 
 7. **Run it on a virtual device.** Point virtual-devices at your image:

@@ -1,6 +1,6 @@
 # Image
 
-The Blackbird OS image definition, built with [mkosi](https://github.com/systemd/mkosi) inside the Debian build VM by toolkit-image's `odap-image build <profile>`.
+The Blackbird OS image definition, built with [mkosi](https://github.com/systemd/mkosi) inside the Debian build VM by toolkit-image's `odapkit image build <profile>`.
 
 - `mkosi.conf`: what every output shares (Debian trixie, kernel from trixie-backports), and what the image leaves out because it serves nothing on the device (OS-021):
   - documentation, manual pages and translations of system tools, through dpkg's path filters (`mkosi.sandbox/etc/dpkg/dpkg.cfg.d/01-blackbird-slim`; copyright files stay), applied again by `scripts/slim.postinst.chroot` to the essential packages that mkosi unpacks before dpkg;
@@ -18,4 +18,4 @@ The Blackbird OS image definition, built with [mkosi](https://github.com/systemd
 - `mkosi.extra/usr/bin/odap-reboot`: restarts into a boot mode of the device: `normal`, `debug` when the image has the debug entry, and whatever a board support package adds as `/usr/lib/opendap/boot-modes.d/<mode>` (`--list` names them). The `opendap` CLI and `odap-vdev` call it instead of imitating button combinations.
 - `mkosi.env` and `mkosi.postinst.chroot`: the system's identity in every output ([ADR 0011](../docs/adr/0011-blackbird-os.md)). `mkosi.env` holds the `OS_*` values (name, ID, version, URLs); the script writes `/usr/lib/os-release` from them (`ID=blackbird`, `ID_LIKE=debian`, no codename), with Debian's file diverted so package upgrades keep it, plus `/etc/issue` and the login message in `/etc/motd` (with Debian's licence and warranty notice). A derivative sets its own values without changing these files ([guide](../docs/derivatives.md)).
 
-Build with toolkit-image `odap-image build`; run with virtual-devices `odap-vdev start`.
+Build with toolkit-image `odapkit image build`; run with virtual-devices `odap-vdev start`.

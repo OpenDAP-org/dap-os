@@ -6,7 +6,7 @@ To build your own custom ROM based on Blackbird OS, see [docs/derivatives.md](do
 
 ## Layout
 
-- `image/` — the image definition (built with toolkit-image `odap-image`; outputs in `image/mkosi.output/`)
+- `image/` — the image definition (built with toolkit-image `odapkit image`; outputs in `image/mkosi.output/`)
 - `examples/` — `derivative/`, a minimal distribution based on Blackbird OS ([guide](docs/derivatives.md))
 - `docs/`
 
