@@ -6,6 +6,8 @@ DefaultDependencies=no
 After=systemd-modules-load.service systemd-udev-settle.service
 Before=odap-shell.service
 ConditionPathExists=/usr/bin/odap-statusled
+# It waits for its LED itself; a missing one is never a reason to stop retrying.
+StartLimitIntervalSec=0
 
 [Service]
 ExecStart=/usr/bin/odap-statusled
